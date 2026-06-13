@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rendering — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Rendering</span>
+        </nav>
+
+        <h1>Rendering System</h1>
+        <p>
+          The rendering system is built around the <a href="modules/cpixmap.html"><code>CPixmap</code></a> class,
+          which wraps DirectDraw surface management. On non-Windows platforms, Free Direct
+          provides SDL3-based implementations of the DirectDraw API.
+        </p>
+
+        <h2 id="cpixmap-overview">CPixmap Overview</h2>
+        <p>
+          <strong>Header:</strong> <code>include/pixmap.hpp</code><br>
+          <strong>Source:</strong> <code>src/pixmap.cpp</code> (~1,922 lines)
+        </p>
+        <p>
+          <code>CPixmap</code> is the image surface manager. It allocates and manages
+          15 DirectDraw surfaces (one per channel), handles sprite blitting, and manages
+          the display pipeline.
+        </p>
+
+        <h2 id="resolution">Resolution</h2>
+        <p>The game renders at a fixed <strong>640×480 pixel</strong> resolution:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>LXIMAGE</code></td><td>640</td><td>Game window width (pixels)</td></tr>
+              <tr><td><code>LYIMAGE</code></td><td>480</td><td>Game window height (pixels)</td></tr>
+              <tr><td><code>POSDRAWX</code></td><td>0</td><td>Draw origin X</td></tr>
+              <tr><td><code>POSDRAWY</code></td><td>0</td><td>Draw origin Y</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="channels">Image Channel System</h2>
+        <p>
+          CPixmap manages 15 independent render channels, each backed by a separate
+          DirectDraw surface. Content is rendered into these channels and composited
+          to produce the final frame.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Channel</th><th>Value</th><th>Content</th><th>Image File</th></tr></thead>
+            <tbody>
+              <tr><td><code>CHBACK</code></td><td>0</td><td>Background terrain</td><td><code>decor000–031.blp</code></td></tr>
+              <tr><td><code>CHOBJECT</code></td><td>1</td><td>Foreground objects and pickups</td><td><code>object.blp</code></td></tr>
+              <tr><td><code>CHBLUPI</code></td><td>2</td><td>Default player character</td><td><code>blupi000.blp</code></td></tr>
+              <tr><td><code>CHDECOR</code></td><td>3</td><td>Decorative overlays</td><td><code>decor000–031.blp</code></td></tr>
+              <tr><td><code>CHBUTTON</code></td><td>4</td><td>UI buttons</td><td><code>button.blp</code></td></tr>
+              <tr><td><code>CHJAUGE</code></td><td>5</td><td>Gauge bar sprites</td><td><code>jauge.blp</code></td></tr>
+              <tr><td><code>CHTEXT</code></td><td>6</td><td>Normal text characters</td><td><code>text.blp</code></td></tr>
+              <tr><td><code>CHLITTLE</code></td><td>7</td><td>Small text characters</td><td><code>littletxt.blp</code></td></tr>
+              <tr><td><code>CHMAP</code></td><td>8</td><td>Minimap sprites</td><td><code>map.blp</code></td></tr>
+              <tr><td><code>CHEXPLO</code></td><td>9</td><td>Explosion sprites</td><td><code>explo.blp</code></td></tr>
+              <tr><td><code>CHELEMENT</code></td><td>10</td><td>Particle/element effects</td><td><code>element.blp</code></td></tr>
+              <tr><td><code>CHBLUPI1</code></td><td>11</td><td>Player variant 1 (multiplayer)</td><td><code>blupi001.blp</code></td></tr>
+              <tr><td><code>CHBLUPI2</code></td><td>12</td><td>Player variant 2 (multiplayer)</td><td><code>blupi002.blp</code></td></tr>
+              <tr><td><code>CHBLUPI3</code></td><td>13</td><td>Player variant 3 (multiplayer)</td><td><code>blupi003.blp</code></td></tr>
+              <tr><td><code>CHTEMP</code></td><td>14</td><td>Temporary scratch surface</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="sprite-sizes">Sprite Dimensions</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Sprite Type</th><th>Width</th><th>Height</th><th>Constants</th></tr></thead>
+            <tbody>
+              <tr><td>Objects (enemies, items, vehicles)</td><td>64 px</td><td>64 px</td><td><code>DIMOBJX</code>, <code>DIMOBJY</code></td></tr>
+              <tr><td>Player character (Blupi)</td><td>60 px</td><td>60 px</td><td><code>DIMBLUPIX</code>, <code>DIMBLUPIY</code></td></tr>
+              <tr><td>Explosions</td><td>128 px</td><td>128 px</td><td><code>DIMEXPLOX</code>, <code>DIMEXPLOY</code></td></tr>
+              <tr><td>UI Buttons</td><td>40 px</td><td>40 px</td><td><code>DIMBUTTONX</code>, <code>DIMBUTTONY</code></td></tr>
+              <tr><td>Gauge bars</td><td>124 px</td><td>22 px</td><td><code>DIMJAUGEX</code>, <code>DIMJAUGEY</code></td></tr>
+              <tr><td>Normal text characters</td><td>16 px max</td><td>16 px max</td><td><code>DIMTEXTX</code>, <code>DIMTEXTY</code></td></tr>
+              <tr><td>Small text characters</td><td>16 px max</td><td>12 px max</td><td><code>DIMLITTLEX</code>, <code>DIMLITTLEY</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="render-pipeline">Render Pipeline</h2>
+        <p>Each game tick, the rendering sequence is approximately:</p>
+        <ol>
+          <li><code>CDecor::Build(rect)</code> is called to render the game world</li>
+          <li>Terrain cells in the visible area are blitted from <code>CHBACK</code></li>
+          <li>Moving objects are drawn from <code>CHOBJECT</code>, <code>CHEXPLO</code>, etc.</li>
+          <li>Player character is drawn from <code>CHBLUPI</code></li>
+          <li>Decorative overlays from <code>CHDECOR</code> are applied</li>
+          <li>UI elements (buttons, gauges, text) from <code>CHBUTTON</code>, <code>CHJAUGE</code>, <code>CHTEXT</code>, <code>CHLITTLE</code></li>
+          <li>Minimap drawn from <code>CHMAP</code></li>
+          <li>Final composited frame blitted from backbuffer to primary surface</li>
+          <li><code>CPixmap::Display()</code> presents the frame</li>
+        </ol>
+
+        <h2 id="scrolling">Camera Scrolling</h2>
+        <p>
+          The camera scrolls to follow the player. Scrolling is triggered when
+          the player approaches the screen edge:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>SCROLL_SPEED</code></td><td>8</td><td>Camera scroll speed (pixels per tick)</td></tr>
+              <tr><td><code>SCROLL_MARGX</code></td><td>80</td><td>Horizontal scroll trigger margin (pixels from edge)</td></tr>
+              <tr><td><code>SCROLL_MARGY</code></td><td>40</td><td>Vertical scroll trigger margin (pixels from edge)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="color-modes">Color Depth Modes</h2>
+        <p>
+          The game supports both 8-bit palette and 16-bit true-color rendering,
+          selected via the <code>TrueColorBack</code> and <code>TrueColorDecor</code>
+          settings in <code>config.def</code>:
+        </p>
+        <ul>
+          <li><strong>8-bit mode</strong> — uses <code>gamefiles/IMAGE08/</code> assets</li>
+          <li><strong>16-bit mode</strong> — uses <code>gamefiles/IMAGE16/</code> assets (default)</li>
+          <li><code>jauge.blp</code> and <code>map.blp</code> are always loaded from IMAGE08 (no 16-bit version)</li>
+        </ul>
+
+        <h2 id="known-issues">Known Rendering Issues</h2>
+        <div class="callout danger">
+          <span class="callout-icon">⛔</span>
+          <div class="callout-body">
+            <div class="callout-title">Double Create() Issue</div>
+            <code>CPixmap::Create()</code> is called twice during startup — once directly,
+            and once inside <code>CPixmap::CacheAll(TRUE, …)</code>. This is a likely
+            decompilation artifact. Real DirectDraw may reject the second initialization.
+            See <a href="development/known-issues.html">Known Issues</a>.
+          </div>
+        </div>
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Parameter Swap Bug</div>
+            The <code>bTrueColorBack</code> and <code>bTrueColorDecor</code> parameters
+            appear to be swapped between the declaration in <code>pixmap.hpp</code> and
+            the definition in <code>pixmap.cpp</code>. This may produce incorrect behavior
+            when the two color depth settings differ.
+          </div>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="levels.html">← <span class="pnl-label">Levels &amp; Worlds</span></a>
+          <a class="page-nav-link next" href="audio.html"><span class="pnl-label">Audio System</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('rendering');</script>
+</body>
+</html>

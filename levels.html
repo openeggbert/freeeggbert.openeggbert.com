@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Levels &amp; Worlds — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Levels &amp; Worlds</span>
+        </nav>
+
+        <h1>Levels &amp; Worlds</h1>
+
+        <h2 id="level-files">Level Files</h2>
+        <p>
+          Levels are stored as <code>.blp</code> binary files in <code>gamefiles/DATA/</code>.
+          Each file contains a level header (<code>DescFile</code>) followed by the full world
+          grid data.
+        </p>
+
+        <h2 id="descfile">Level File Header (DescFile)</h2>
+        <p>
+          The <code>DescFile</code> struct (defined in <code>include/decor.hpp</code>)
+          is the header stored at the beginning of each <code>worldNNN.blp</code> file:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>majRev</code></td><td>short</td><td>File format major revision</td></tr>
+              <tr><td><code>minRev</code></td><td>short</td><td>File format minor revision</td></tr>
+              <tr><td><code>posDecor</code></td><td>POINT</td><td>Initial camera/scroll position</td></tr>
+              <tr><td><code>dimDecor</code></td><td>POINT</td><td>World dimensions used in this level</td></tr>
+              <tr><td><code>world</code></td><td>short</td><td>World/chapter number</td></tr>
+              <tr><td><code>music</code></td><td>short</td><td>Background music track index (0–9)</td></tr>
+              <tr><td><code>region</code></td><td>short</td><td>Visual region/theme (selects decor spritesheet)</td></tr>
+              <tr><td><code>blupiPos[4]</code></td><td>POINT[4]</td><td>Player start positions (up to 4 players)</td></tr>
+              <tr><td><code>blupiDir[4]</code></td><td>int[4]</td><td>Player start facing directions</td></tr>
+              <tr><td><code>name[100]</code></td><td>char[100]</td><td>Level name string</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="world-grid">World Grid</h2>
+        <p>
+          The world is a <strong>100×100 grid</strong> of cells.
+          Each cell holds a <code>Cellule</code> — essentially a 16-bit icon index into the
+          terrain spritesheet for the current region.
+        </p>
+        <pre><code><span class="kw">typedef struct</span> {
+    <span class="kw2">short</span> icon;  <span class="cmt">// sprite index into the background/decor sheet</span>
+} Cellule;</code></pre>
+        <p>
+          Two grids are stored in <code>DescSave</code>:
+        </p>
+        <ul>
+          <li><code>decor[100][100]</code> — main terrain grid</li>
+          <li><code>bigDecor[100][100]</code> — background/decor overlay layer</li>
+        </ul>
+
+        <h2 id="chapter-structure">Chapter Structure</h2>
+        <p>
+          Levels are stored as <code>worldNNN.blp</code> files in <code>gamefiles/DATA/</code>.
+          The numbering scheme groups them into chapters — 74 main-game levels plus bonus, special and secret levels (96 world files total).
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>World Files</th><th>Chapter</th><th>Count</th></tr></thead>
+            <tbody>
+              <tr><td>001</td><td>Tutorial / Intro</td><td>1</td></tr>
+              <tr><td>010, 020–025</td><td>Chapter 1</td><td>7</td></tr>
+              <tr><td>030–034, 040–046</td><td>Chapter 2</td><td>12</td></tr>
+              <tr><td>050–058</td><td>Chapter 3</td><td>9</td></tr>
+              <tr><td>060–066</td><td>Chapter 4</td><td>7</td></tr>
+              <tr><td>070–075</td><td>Chapter 5</td><td>6</td></tr>
+              <tr><td>080–084</td><td>Chapter 6</td><td>5</td></tr>
+              <tr><td>090–095</td><td>Chapter 7</td><td>6</td></tr>
+              <tr><td>100–107</td><td>Chapter 8</td><td>8</td></tr>
+              <tr><td>110–115</td><td>Chapter 9</td><td>6</td></tr>
+              <tr><td>120–125</td><td>Chapter 10</td><td>6</td></tr>
+              <tr><td>199</td><td>Special</td><td>1</td></tr>
+              <tr><td>201–212</td><td>Bonus / Extra</td><td>12</td></tr>
+              <tr><td>300–309</td><td>Secret</td><td>10</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="regions">Visual Regions</h2>
+        <p>
+          Each level has a <strong>region</strong> setting that determines which terrain spritesheet
+          (<code>decor000.blp</code>–<code>decor031.blp</code>) is used for rendering.
+          32 regions are defined, each representing a distinct visual theme.
+        </p>
+        <div class="callout verify">
+          <span class="callout-icon">🔍</span>
+          <div class="callout-body">
+            <div class="callout-title">Needs Verification</div>
+            The complete mapping of region numbers to visual themes (e.g., grass, snow, cave,
+            underwater) is not fully documented. This requires analysis of the decor spritesheet files.
+          </div>
+        </div>
+
+        <h2 id="moving-objects">Moving Objects in Levels</h2>
+        <p>
+          Each level can contain up to <strong>200 simultaneously active moving objects</strong>
+          (<code>MAXMOVEOBJECT</code>). These include:
+        </p>
+        <ul>
+          <li>Enemies (fish, birds, wasps, creatures)</li>
+          <li>Bombs (floor, hanging, moving, homing)</li>
+          <li>Vehicles (helicopter, jeep, tank, hovercraft)</li>
+          <li>Interactive objects (crates, lifts, conveyors)</li>
+          <li>Collectibles (treasure, eggs, keys)</li>
+          <li>Visual effects (explosions, splashes, particles)</li>
+        </ul>
+        <p>
+          Each moving object is defined by a <code>MoveObject</code> struct with type,
+          start/end positions, timing, and animation state.
+          See <a href="reference/data-structures.html#moveobject">Data Structures → MoveObject</a>.
+        </p>
+
+        <h2 id="level-editor">Level Editor</h2>
+        <p>
+          The game includes a built-in level editor (<code>WM_PHASE_BUILD</code>),
+          implemented in <code>src/decdesign.cpp</code>.
+          The editor allows placing and removing tiles and objects.
+        </p>
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Editor Incomplete</div>
+            The level editor (<code>decdesign.cpp</code>) has known missing features and is
+            considered one of the files requiring the most work. Custom level editing and
+            export may not function correctly.
+          </div>
+        </div>
+        <p>Level editor I/O phases:</p>
+        <ul>
+          <li><code>WM_PHASE_NAMEDESIGN</code> — name a custom level</li>
+          <li><code>WM_PHASE_WRITEDESIGN</code> — export design to <code>c:\user</code> (legacy path)</li>
+          <li><code>WM_PHASE_READDESIGN</code> — import design</li>
+          <li><code>WM_PHASE_CLEARDESIGN</code> — clear the current design</li>
+          <li><code>WM_PHASE_PLAYTEST</code> — test the current design in-game</li>
+        </ul>
+
+        <h2 id="save-state">Save Game State (DescSave)</h2>
+        <p>
+          The full game state — including the world grid, all moving objects, and player
+          status — is serialized to a <code>DescSave</code> struct (~56KB) when saving.
+          Up to 6 save slots (<code>MAXSAVE=6</code>) are supported.
+        </p>
+        <p>See <a href="reference/data-structures.html#descsave">Data Structures → DescSave</a> for the complete field list.</p>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="assets.html">← <span class="pnl-label">Assets &amp; Files</span></a>
+          <a class="page-nav-link next" href="rendering.html"><span class="pnl-label">Rendering</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('levels');</script>
+</body>
+</html>

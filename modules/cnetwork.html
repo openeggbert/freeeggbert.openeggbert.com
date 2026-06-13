@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CNetwork — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Modules</a>
+          <span class="sep">/</span>
+          <span class="current">CNetwork</span>
+        </nav>
+
+        <h1>CNetwork</h1>
+        <p>
+          <strong>Header:</strong> <code>include/network.hpp</code><br>
+          <strong>Implementation:</strong> <code>src/network.cpp</code>
+        </p>
+        <p>
+          <code>CNetwork</code> wraps <strong>DirectPlay</strong> (DirectX 3) session management.
+          It handles the multiplayer lobby: creating and browsing game sessions, connecting
+          players, and sending/receiving <code>NetPacket</code> data each game tick.
+          In-game synchronization is handled in <code>src/decnet.cpp</code> (part of <code>CDecor</code>).
+        </p>
+
+        <div class="callout danger">
+          <span class="callout-icon">🚨</span>
+          <div class="callout-body">
+            <div class="callout-title">Multiplayer is currently broken</div>
+            Network synchronization in <code>src/decnet.cpp</code> is incomplete.
+            DirectPlay support through Free Direct / Free API is unverified.
+            Do not expect multiplayer to work in the current build.
+          </div>
+        </div>
+
+        <h2 id="overview">Overview</h2>
+        <p>
+          Free Eggbert supports up to 4 simultaneous network players.
+          Networking is built on <strong>DirectPlay</strong> from DirectX 3, which provides
+          session browsing over IPX, TCP/IP, and modem transports.
+        </p>
+
+        <h2 id="session-lifecycle">Session Lifecycle</h2>
+        <p>
+          The multiplayer flow is driven by game phases in <code>CEvent</code>:
+        </p>
+        <ol>
+          <li><code>WM_PHASE_SERVICE</code> — select DirectPlay transport (IPX, TCP/IP, modem)</li>
+          <li><code>WM_PHASE_SESSION</code> — browse available sessions or create a new one</li>
+          <li><code>WM_PHASE_MULTI</code> — pre-game lobby; wait for all players to join</li>
+          <li><code>WM_PHASE_PLAY</code> — synchronized gameplay begins</li>
+        </ol>
+
+        <h2 id="key-methods">Methods</h2>
+        <p>Full signatures from <code>include/network.hpp</code>:</p>
+        <pre><code><span class="cmt">// Session management</span>
+BOOL EnumProviders();
+<span class="kw2">int</span>  GetNbProviders();
+<span class="kw2">char</span>* GetProviderName(<span class="kw2">int</span> index);
+BOOL CreateProvider(<span class="kw2">int</span> index);  <span class="cmt">// selects IPX, TCP/IP, modem</span>
+<span class="kw">void</span> FreeProviderList();
+
+BOOL EnumSessions();
+<span class="kw2">int</span>  GetNbSessions();
+<span class="kw2">char</span>* GetSessionName(<span class="kw2">int</span> index);
+BOOL JoinSession(<span class="kw2">int</span> index, <span class="kw2">char</span>* pPlayerName);
+BOOL CreateSession(<span class="kw2">char</span>* pSessionName, <span class="kw2">char</span>* pPlayerName);
+<span class="kw">void</span> FreeSessionList();
+
+BOOL Close();
+BOOL IsHost();
+
+<span class="cmt">// Raw packet I/O (called by decnet.cpp each tick)</span>
+BOOL Send(LPVOID lpData, DWORD dwDataSize, DWORD dwFlags);
+BOOL Receive(LPVOID pDest, DWORD dwDataSize, LPDWORD lpdwPlayer);</code></pre>
+
+        <h2 id="net-player">NetPlayer Struct</h2>
+        <p>Tracks one remote player's connection state, stored in <code>m_players[MAXNETPLAYER]</code>:</p>
+        <pre><code><span class="kw">typedef struct</span> {
+    <span class="kw2">char</span>  bIsPresent;   <span class="cmt">// slot occupied</span>
+    <span class="kw2">char</span>  ready;        <span class="cmt">// player ready to start</span>
+    <span class="kw2">char</span>  unk_2;
+    <span class="kw2">char</span>  unk_3;
+    DPID  dpid;         <span class="cmt">// DirectPlay player ID</span>
+    <span class="kw">short</span> team;
+    <span class="kw2">char</span>  name[22];     <span class="cmt">// player name string</span>
+} NetPlayer;</code></pre>
+
+        <h2 id="packet-types">Packet Types (PK_*)</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>PK_LEAVE</code></td><td>8</td><td>Player left the session</td></tr>
+              <tr><td><code>PK_LOST</code></td><td>9</td><td>Player lost (game over)</td></tr>
+              <tr><td><code>PK_DIE</code></td><td>10</td><td>Player died</td></tr>
+              <tr><td><code>PK_PAUSE</code></td><td>12</td><td>Game pause toggled</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="in-game-sync">In-Game Synchronization</h2>
+        <p>
+          Actual in-game synchronization is implemented in <code>src/decnet.cpp</code>, which is
+          part of the <code>CDecor</code> class. Each game tick, every player sends a
+          <code>NetPacket</code> containing their current input, position, animation state,
+          and up to 5 <code>NetMessage</code> game events.
+        </p>
+        <p>
+          See <a href="../systems/network.html">Network System</a> for the full packet structure,
+          <code>MESS_*</code> constants, and personal bomb types.
+          See <a href="../reference/data-structures.html#netpacket">Data Structures</a> for
+          the <code>NetPacket</code> and <code>NetMessage</code> struct layouts.
+        </p>
+
+        <h2 id="session-limit">Session Limits</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>MAXNETPLAYER</code></td><td>4</td><td>Maximum simultaneous network players</td></tr>
+              <tr><td><code>MAXTEAM</code></td><td>4</td><td>Maximum teams</td></tr>
+              <tr><td><code>MAXSESSION</code></td><td>100</td><td>Max sessions shown in browser UI</td></tr>
+              <tr><td><code>MAXNETMESSAGE</code></td><td>20</td><td>Max pending network messages</td></tr>
+              <tr><td><code>MAXMESSAGEPERPACKET</code></td><td>5</td><td>Max game events per packet</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="cevent.html">← <span class="pnl-label">CEvent</span></a>
+          <a class="page-nav-link next" href="ui.html"><span class="pnl-label">UI Components</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('cnetwork');</script>
+</body>
+</html>

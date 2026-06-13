@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roadmap — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Roadmap</span>
+        </nav>
+
+        <h1>Roadmap</h1>
+        <p>
+          Project goals derived from <code>README.md</code> and <code>TODO.md</code>.
+          This reflects the current development direction as of the repository state.
+        </p>
+
+        <h2 id="immediate-goals">Immediate Goals</h2>
+        <ol>
+          <li>Add detailed logging around DirectDraw initialization to diagnose the double Create() issue</li>
+          <li>Verify whether <code>CPixmap::Create()</code> is really called twice at startup</li>
+          <li>Clarify the <code>bTrueColorBack</code> / <code>bTrueColorDecor</code> parameter order</li>
+          <li>Fix or document the <code>delete this</code> UB in <code>CPixmap::CacheAll(FALSE)</code></li>
+          <li>Verify clean checkout builds on Linux without system SDL packages</li>
+        </ol>
+
+        <h2 id="core-goals">Core Development Goals</h2>
+        <ul>
+          <li>☐ Improve accuracy of the decompiled source code</li>
+          <li>☐ Restore missing or defective gameplay behavior</li>
+          <li>☐ Complete <code>decblupi.cpp</code> — player physics and vehicle logic</li>
+          <li>☐ Complete <code>event.cpp</code> — input processing and phase dispatch</li>
+          <li>☐ Complete <code>decmove.cpp</code> — enemy and object AI</li>
+          <li>☐ Complete <code>decblock.cpp</code> — crate/door/block interaction</li>
+          <li>☐ Complete <code>decio.cpp</code> — save/load serialization</li>
+          <li>☐ Complete <code>decdesign.cpp</code> — level editor</li>
+          <li>☐ Fix or stub DirectPlay network initialization</li>
+        </ul>
+
+        <h2 id="documentation-goals">Documentation Goals</h2>
+        <ul>
+          <li>☐ Add Doxygen documentation to all headers and source files</li>
+          <li>☐ Document all <code>TYPE_*</code>, <code>ACTION_*</code>, and <code>SOUND_*</code> constants in context</li>
+          <li>☐ Document the <code>.blp</code> binary file format specification</li>
+        </ul>
+
+        <h2 id="platform-goals">Platform Goals</h2>
+        <ul>
+          <li>☐ Complete CMake FreeDirect support (in progress)</li>
+          <li>☐ Port to additional platforms beyond Windows</li>
+          <li>☐ Finalize and test Android support</li>
+          <li>☐ Finalize and test web browser (Emscripten) support</li>
+          <li>☐ Verify macOS build</li>
+        </ul>
+
+        <h2 id="build-goals">Build System Goals</h2>
+        <ul>
+          <li>☐ Change <code>target_include_directories</code> to PRIVATE for game executable</li>
+          <li>☐ Verify <code>/permissive-</code> MSVC flag appropriateness</li>
+          <li>☐ Verify SDL runtime DLL copying on Windows</li>
+          <li>☐ Consider CMake option for audio backend: <code>FREE_EGGBERT_AUDIO_BACKEND=DSOUND|BASS|STUB</code></li>
+          <li>☐ Consider strict FreeDirect mode (<code>FREE_DIRECT_STRICT=1</code>) for catching DirectDraw contract violations</li>
+        </ul>
+
+        <h2 id="debugging-priority">Recommended Debugging Priority</h2>
+        <p>From <code>TODO.md</code>, the recommended priority order is:</p>
+        <ol>
+          <li>Add detailed logging around DirectDraw initialization</li>
+          <li>Verify whether <code>CPixmap::Create()</code> is really called twice</li>
+          <li>Capture exact <code>HRESULT</code> values from DirectDraw calls</li>
+          <li>Decide ownership of <code>CPixmap::Create()</code> — either DoInit() or CacheAll(), not both</li>
+          <li>Clarify the <code>bTrueColorBack</code> / <code>bTrueColorDecor</code> parameter order</li>
+          <li>Keep unrelated systems separate during this investigation</li>
+          <li>After fullscreen path is understood, continue with web/Android portability work</li>
+        </ol>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('roadmap');</script>
+</body>
+</html>

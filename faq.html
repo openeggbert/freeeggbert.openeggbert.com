@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">FAQ</span>
+        </nav>
+
+        <h1>Frequently Asked Questions</h1>
+
+        <h2 id="what-is">What is Free Eggbert?</h2>
+        <p>
+          Free Eggbert is an open-source reconstruction of Speedy Eggbert 2 (Speedy Blupi II),
+          a side-scrolling platformer originally developed for Windows using DirectX 3.
+          It is based on decompiled and reverse-engineered binary code.
+          See <a href="overview.html">Project Overview</a>.
+        </p>
+
+        <h2 id="does-it-work">Does the game work/run?</h2>
+        <p>
+          Partially. Gameplay is functional in some areas but many features are incomplete,
+          inaccurate, or missing. It is a work-in-progress project.
+          See the <a href="index.html#current-status">status table</a> on the home page.
+        </p>
+
+        <h2 id="where-assets">Where do I get the game assets?</h2>
+        <p>
+          Game assets (DATA, IMAGE08, IMAGE16, SOUND directories) are copyrighted by their
+          original authors and are not included in the repository. You must obtain them from
+          a legal copy of Speedy Eggbert 2.
+        </p>
+
+        <h2 id="platforms">What platforms are supported?</h2>
+        <p>
+          Windows (Visual Studio or CMake), Linux (CMake), macOS (CMake — needs verification),
+          Web (Emscripten), and Android (NDK + Gradle).
+          See <a href="platform-support.html">Platform Support</a>.
+        </p>
+
+        <h2 id="build-fail">My build fails — what do I do?</h2>
+        <ol>
+          <li>Make sure you ran <code>git submodule update --init --recursive</code></li>
+          <li>Try a clean rebuild: <code>rm -rf build &amp;&amp; cmake -S . -B build -DSPEEDY_BLUPI_BACKEND=FREEDIRECT &amp;&amp; cmake --build build -j</code></li>
+          <li>Check that you have a C++20 capable compiler</li>
+          <li>Check <a href="development/known-issues.html">Known Issues</a> for common problems</li>
+        </ol>
+
+        <h2 id="no-audio">The game runs but there is no audio — why?</h2>
+        <p>
+          Verify that <code>gamefiles/SOUND/</code> exists and contains <code>.blp</code> files.
+          The audio backend (<code>_BASS=FALSE</code> by default) uses DirectSound/MCI.
+          See <a href="audio.html">Audio System</a>.
+        </p>
+
+        <h2 id="network">Can I play multiplayer?</h2>
+        <p>
+          No. DirectPlay network initialization fails silently in the current build.
+          The game always falls back to single-player mode.
+          See <a href="systems/network.html">Network System</a>.
+        </p>
+
+        <h2 id="legal">Is this legal?</h2>
+        <p>
+          Free Eggbert is intended for research, preservation, documentation, and
+          compatibility work. It reconstructs game logic from binary analysis but
+          does not distribute the original game's assets or executable.
+          The project is released under GPLv3. You are responsible for ensuring
+          you comply with applicable laws in your jurisdiction.
+        </p>
+
+        <h2 id="planet-blupi">Is this the same as Planet Blupi?</h2>
+        <p>
+          No. Planet Blupi is a different game (an isometric RTS/puzzle) with officially
+          released source code. Free Eggbert reconstructs Speedy Blupi II, a side-scrolling
+          platformer. They share engine ancestry but are separate projects.
+          See <a href="free-eggbert-vs-original.html">Free Eggbert vs. Speedy Blupi</a>.
+        </p>
+
+        <h2 id="contribute">How can I contribute?</h2>
+        <p>
+          The most valuable contributions are:
+        </p>
+        <ul>
+          <li>Verifying decompiled game behavior against the original binary</li>
+          <li>Fixing known decompilation artifacts (see <a href="development/known-issues.html">Known Issues</a>)</li>
+          <li>Improving accuracy of player physics, enemy AI, and block interactions</li>
+          <li>Adding Doxygen documentation</li>
+          <li>Testing on different platforms</li>
+        </ul>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('faq');</script>
+</body>
+</html>

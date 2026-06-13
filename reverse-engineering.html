@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reverse Engineering — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Reverse Engineering</span>
+        </nav>
+
+        <h1>Reverse Engineering Notes</h1>
+        <p>
+          Free Eggbert is based on decompiled and reverse-engineered binary code.
+          This page documents the methodology, sources, and known artifacts of the
+          decompilation process.
+        </p>
+
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            <div class="callout-title">Note on Accuracy</div>
+            Decompiled code is an approximation of the original. Some behaviors,
+            variable names, and structures are inferred, not proven. Items marked
+            <span class="badge badge-verify">Needs Verification</span> should be
+            verified against the original game behavior before being relied upon.
+          </div>
+        </div>
+
+        <h2 id="methodology">Methodology</h2>
+        <p>Three tools were used to reconstruct the source code:</p>
+
+        <h3 id="ghidra">Ghidra</h3>
+        <p>
+          <strong>Ghidra</strong> (NSA open-source reverse engineering suite) was used for
+          binary analysis, decompilation, and control-flow reconstruction of the Windows
+          executable. Ghidra produces C-like pseudocode from assembly which can be
+          translated back to C++.
+        </p>
+
+        <h3 id="ida">IDA</h3>
+        <p>
+          <strong>IDA</strong> (Interactive Disassembler) was used for additional binary
+          disassembly and analysis, complementing the Ghidra output.
+        </p>
+
+        <h3 id="ilspy">ILSpy and the Windows Phone 2013 Port</h3>
+        <p>
+          The most valuable source of symbol names came from inspecting the
+          <strong>2013 Windows Phone version of Speedy Blupi</strong> using
+          <strong>ILSpy</strong>. This port was compiled in a way that preserved
+          <strong>demangled C++ symbol names</strong>, providing function names,
+          class names, and member variable names that are not available in the
+          original Windows binary.
+        </p>
+        <p>
+          Special thanks to <strong>Ч.У.Ш</strong> from the 4PDA forum for archiving
+          this obscure port.
+        </p>
+
+        <h3 id="planet-blupi">Planet Blupi Reference</h3>
+        <p>
+          <strong>Planet Blupi</strong> — the official open-source release of the shared
+          ancestor engine — is used as a behavioral reference. Where the decompiled output
+          is ambiguous, the Planet Blupi implementation often reveals the intended algorithm,
+          since the two codebases share common ancestry and many functions are nearly identical.
+        </p>
+
+        <h2 id="known-artifacts">Known Decompilation Artifacts</h2>
+        <p>
+          Several areas of the codebase are known to contain decompilation artifacts —
+          code that compiles but does not represent the original accurately.
+        </p>
+
+        <h3 id="artifact-double-create">Double CPixmap::Create() Call</h3>
+        <div class="callout danger">
+          <span class="callout-icon">⛔</span>
+          <div class="callout-body">
+            <div class="callout-title">Suspected Artifact</div>
+            <code>CPixmap::Create()</code> is called twice during startup — once directly
+            from <code>DoInit()</code>, and again inside <code>CPixmap::CacheAll(TRUE, …)</code>.
+            This likely did not happen in the original code. Real DirectDraw may reject the
+            second initialization with errors like <code>DDERR_EXCLUSIVEMODEALREADYSET</code>.
+          </div>
+        </div>
+
+        <h3 id="artifact-parameter-swap">bTrueColorBack / bTrueColorDecor Parameter Swap</h3>
+        <p>
+          In <code>include/pixmap.hpp</code>, <code>CPixmap::Create()</code> is declared with
+          parameters in the order <code>(bTrueColor, bTrueColorDecor)</code>. However, in
+          <code>src/pixmap.cpp</code>, the definition uses the names swapped:
+          <code>(bTrueColorDecor, bTrueColor)</code>. This causes the assignments to be reversed:
+        </p>
+        <pre><code>m_bTrueColorDecor = bTrueColorDecor;  <span class="cmt">// but receives the "back" value</span>
+m_bTrueColorBack  = bTrueColor;        <span class="cmt">// but receives the "decor" value</span></code></pre>
+        <p>
+          The mismatch may work accidentally when both values are the same (16-bit mode),
+          but can produce wrong behavior if background and decor use different color depths.
+        </p>
+
+        <h3 id="artifact-delete-this">Unsafe delete this in CacheAll(FALSE)</h3>
+        <p>
+          The decompiled <code>CPixmap::CacheAll(FALSE)</code> path contains code that
+          calls <code>delete this</code> and then immediately reads member variables
+          (<code>m_hWnd</code>, <code>m_bFullScreen</code>, etc.). This is
+          <strong>undefined behavior</strong> in C++. It is likely a decompilation
+          artifact or an incorrectly reconstructed pattern from the original.
+        </p>
+
+        <h3 id="artifact-rectangle">Suspicious Rectangle Initialization</h3>
+        <p>
+          In <code>CacheAll(TRUE)</code>, there is decompiled code that initializes a
+          rectangle using nonsensical operations:
+        </p>
+        <pre><code><span class="kw2">char</span> image[12];
+*(char*)image = (LXIMAGE) &lt;&lt; 64;      <span class="cmt">// nonsensical: left-shift by 64</span>
+rect.bottom = LYIMAGE;
+rect.left   = LOWORD(image);           <span class="cmt">// LOWORD on a local array pointer</span>
+rect.top    = HIWORD(image);
+rect.right  = HIWORD(image);
+DrawImage(0, 0, rect, 1);</code></pre>
+        <p>
+          The original code was likely a simple <code>SetRect(&amp;rect, 0, 0, LXIMAGE, LYIMAGE)</code>
+          that the decompiler failed to reconstruct correctly.
+        </p>
+
+        <h3 id="artifact-uninitialized">Widespread Uninitialized Variables</h3>
+        <p>
+          The original binary was compiled with optimizations that reused stack space
+          aggressively. Decompiled code has many variables that appear uninitialized but
+          were actually initialized by the original compiler's register allocation.
+          The MSVC flags <code>/wd4700 /wd4703</code> suppress these warnings.
+        </p>
+
+        <h2 id="legacy-mode">The _LEGACY Flag</h2>
+        <p>
+          The <code>_LEGACY</code> compile flag controls whether known bugs and quirks
+          from the original binary are preserved:
+        </p>
+        <ul>
+          <li><strong><code>_LEGACY=FALSE</code></strong> (default) — enables fixes for confirmed bugs</li>
+          <li><strong><code>_LEGACY=TRUE</code></strong> — restores intentionally broken behaviors for accuracy</li>
+        </ul>
+
+        <h2 id="comparison-planet-blupi">Comparison with Planet Blupi</h2>
+        <p>
+          When behavior in the decompiled output is ambiguous, Planet Blupi is used as a reference.
+          The two codebases share common heritage in:
+        </p>
+        <ul>
+          <li>Class and function naming conventions</li>
+          <li>Data structures (similar grid layout, MoveObject, etc.)</li>
+          <li>Many core algorithms (rendering, physics, object movement)</li>
+        </ul>
+        <p>
+          However, Free Eggbert diverges significantly in the player model (single player vs.
+          100 units), world dimensions (100×100 vs. 200×200 isometric), and many gameplay
+          mechanics. See <a href="free-eggbert-vs-original.html">Free Eggbert vs. Speedy Blupi</a>.
+        </p>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="development/decompilation-notes.html">← <span class="pnl-label">Decompilation Notes</span></a>
+          <a class="page-nav-link next" href="free-eggbert-vs-original.html"><span class="pnl-label">vs. Speedy Blupi</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('reverse-engineering');</script>
+</body>
+</html>

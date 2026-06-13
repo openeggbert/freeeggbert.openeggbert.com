@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Structure — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Project Structure</span>
+        </nav>
+
+        <h1>Project Structure</h1>
+        <p>This page describes the directory layout and purpose of every important file and directory in the Free Eggbert repository.</p>
+
+        <h2 id="root-layout">Root Directory Layout</h2>
+        <div class="file-tree">
+<span class="dir">free-eggbert/</span>
+├── <span class="dir">include/</span>            <span class="note">All header files (.hpp)</span>
+├── <span class="dir">src/</span>                <span class="note">All C++ source files (.cpp)</span>
+├── <span class="dir">gamefiles/</span>          <span class="note">Game assets (NOT in git — user-supplied)</span>
+│   ├── <span class="dir">DATA/</span>           <span class="note">Level worlds, demos, config</span>
+│   ├── <span class="dir">IMAGE08/</span>        <span class="note">8-bit palette images</span>
+│   ├── <span class="dir">IMAGE16/</span>        <span class="note">16-bit true-color images</span>
+│   └── <span class="dir">SOUND/</span>          <span class="note">Music and sound effects</span>
+├── <span class="dir">third_party/</span>        <span class="note">Vendored dependencies (git submodules)</span>
+│   ├── <span class="dir">SDL/</span>            <span class="note">SDL3 library</span>
+│   ├── <span class="dir">SDL_image/</span>      <span class="note">SDL image support</span>
+│   └── <span class="dir">SDL_mixer/</span>      <span class="note">SDL audio support</span>
+├── <span class="dir">dxsdk3/</span>             <span class="note">DirectX 3 SDK (git submodule — reference)</span>
+├── <span class="dir">bass/</span>               <span class="note">BASS audio library binaries</span>
+├── <span class="dir">cmake/</span>              <span class="note">CMake helper modules</span>
+├── <span class="dir">android/</span>            <span class="note">Android build support</span>
+├── <span class="dir">msvc5/</span>              <span class="note">Legacy MSVC 5 project files</span>
+├── <span class="dir">resource/</span>           <span class="note">Windows resource files (.rc, .cur, .ico)</span>
+├── <span class="dir">util/</span>               <span class="note">Utility scripts (Python)</span>
+├── <span class="file">CMakeLists.txt</span>      <span class="note">Main CMake build file</span>
+├── <span class="file">Speedy Eggbert 2 Source.sln</span>  <span class="note">Visual Studio 2022 solution</span>
+├── <span class="file">README.md</span>           <span class="note">Quick-start and build guide</span>
+├── <span class="file">TODO.md</span>             <span class="note">Development checklist</span>
+├── <span class="file">ANDROID.md</span>          <span class="note">Android build notes</span>
+└── <span class="file">LICENSE</span>             <span class="note">GPLv3</span>
+        </div>
+
+        <h2 id="include">include/ — Header Files</h2>
+        <p>All header files use the <code>.hpp</code> extension (unlike the ancestor Planet Blupi which used <code>.h</code>).</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Purpose</th><th>Size (approx)</th></tr></thead>
+            <tbody>
+              <tr><td><code>def.hpp</code></td><td>Global constants, all enums, compile flags (ACTION_*, TYPE_*, SOUND_*, WM_PHASE_*)</td><td>1,413 lines</td></tr>
+              <tr><td><code>decor.hpp</code></td><td>CDecor class declaration, world/game-state structures (DescSave, MoveObject, etc.)</td><td>642 lines</td></tr>
+              <tr><td><code>pixmap.hpp</code></td><td>CPixmap — image surface manager class</td><td>126 lines</td></tr>
+              <tr><td><code>sound.hpp</code></td><td>CSound — audio playback class</td><td>81 lines</td></tr>
+              <tr><td><code>event.hpp</code></td><td>CEvent — input handling and game phase dispatch</td><td>320 lines</td></tr>
+              <tr><td><code>network.hpp</code></td><td>CNetwork — DirectPlay networking</td><td>76 lines</td></tr>
+              <tr><td><code>button.hpp</code></td><td>CButton — UI button rendering</td><td>67 lines</td></tr>
+              <tr><td><code>jauge.hpp</code></td><td>CJauge — progress/gauge bar rendering</td><td>43 lines</td></tr>
+              <tr><td><code>menu.hpp</code></td><td>CMenu — menu system</td><td>50 lines</td></tr>
+              <tr><td><code>text.hpp</code></td><td>Text rendering utilities</td><td>~30 lines</td></tr>
+              <tr><td><code>wave.hpp</code></td><td>WAV file loader</td><td>11 lines</td></tr>
+              <tr><td><code>ddutil.hpp</code></td><td>DirectDraw utility functions</td><td>—</td></tr>
+              <tr><td><code>misc.hpp</code></td><td>Miscellaneous helper functions</td><td>—</td></tr>
+              <tr><td><code>movie.hpp</code></td><td>AVI/movie video playback</td><td>—</td></tr>
+              <tr><td><code>obstacle.hpp</code></td><td>Obstacle/collision data</td><td>—</td></tr>
+              <tr><td><code>dectables.hpp</code></td><td>Decor table declarations</td><td>238 lines</td></tr>
+              <tr><td><code>pixtables.hpp</code></td><td>Pixmap table declarations</td><td>1,198 lines</td></tr>
+              <tr><td><code>texttables.hpp</code></td><td>Text table declarations</td><td>1,674 lines</td></tr>
+              <tr><td><code>web_persistence.hpp</code></td><td>Emscripten IndexedDB persistence (IDBFS)</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="src">src/ — Source Files</h2>
+        <p>The total source is approximately 31,742 lines across 25 files.</p>
+
+        <h3 id="src-complete">Files Tentatively Complete (Need Testing)</h3>
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            "Tentatively complete" means the decompilation appears to be accurate,
+            but testing and verification against the original game behavior is still needed.
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Lines</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>blupi.cpp</code></td><td>953</td><td>WinMain, application entry, window management, message loop</td></tr>
+              <tr><td><code>button.cpp</code></td><td>393</td><td>UI button rendering and hit-testing</td></tr>
+              <tr><td><code>jauge.cpp</code></td><td>147</td><td>Progress/gauge bar rendering</td></tr>
+              <tr><td><code>menu.cpp</code></td><td>160</td><td>Menu rendering and navigation</td></tr>
+              <tr><td><code>movie.cpp</code></td><td>301</td><td>AVI/cutscene video playback</td></tr>
+              <tr><td><code>network.cpp</code></td><td>356</td><td>DirectPlay session and lobby management</td></tr>
+              <tr><td><code>pixmap.cpp</code></td><td>1,922</td><td>DirectDraw surface allocation, blitting, sprite drawing</td></tr>
+              <tr><td><code>sound.cpp</code></td><td>779</td><td>DirectSound initialization and playback</td></tr>
+              <tr><td><code>wave.cpp</code></td><td>272</td><td>WAV file parsing and loading</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="src-wip">Files Requiring the Most Work</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Priority</th><th>File</th><th>Lines</th><th>Issues</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><code>event.cpp</code></td>
+                <td>5,878</td>
+                <td>Most complex file; input processing and phase dispatch incomplete</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><code>decblupi.cpp</code></td>
+                <td>4,395</td>
+                <td>Player physics, movement, all vehicle logic</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><code>decio.cpp</code></td>
+                <td>391</td>
+                <td>Save/load serialization, file format compatibility</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><code>decdesign.cpp</code></td>
+                <td>662</td>
+                <td>Level editor interaction; known missing features</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><code>decblock.cpp</code></td>
+                <td>804</td>
+                <td>Crate, door, block interaction; contains "TODO: rewrite this like a human"</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td><code>decmove.cpp</code></td>
+                <td>2,311</td>
+                <td>Enemy and moving object AI</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td><code>decnet.cpp</code></td>
+                <td>467</td>
+                <td>Network synchronization and event replay</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td><code>decor.cpp</code></td>
+                <td>2,044</td>
+                <td>Core world rendering and initialization</td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td><code>misc.cpp</code></td>
+                <td>—</td>
+                <td>Miscellaneous helpers</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="src-other">Other Source Files</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>dectables.cpp</code></td><td>Static lookup tables for decor (691 lines)</td></tr>
+              <tr><td><code>pixtables.cpp</code></td><td>Static lookup tables for pixmap</td></tr>
+              <tr><td><code>texttables.cpp</code></td><td>Static text tables</td></tr>
+              <tr><td><code>soundbass.cpp</code></td><td>BASS library audio backend (720 lines; active when <code>_BASS=TRUE</code>)</td></tr>
+              <tr><td><code>text.cpp</code></td><td>Text rendering (334 lines)</td></tr>
+              <tr><td><code>obstacle.cpp</code></td><td>Obstacle/collision data</td></tr>
+              <tr><td><code>ddutil.cpp</code></td><td>DirectDraw utilities</td></tr>
+              <tr><td><code>web_persistence.cpp</code></td><td>Emscripten IDBFS persistence (317 lines; empty on non-Emscripten builds)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="gamefiles">gamefiles/ — Game Assets</h2>
+        <p>
+          This directory is <strong>not tracked by git</strong>. Users must supply these
+          files from an original copy of Speedy Eggbert 2. See <a href="assets.html">Assets &amp; Files</a>
+          for the detailed contents of each subdirectory.
+        </p>
+
+        <h2 id="third-party">third_party/ — Vendored Dependencies</h2>
+        <p>Git submodules for the SDL3 stack. Initialized with:</p>
+        <pre><code>git submodule update --init --recursive</code></pre>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Submodule</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>third_party/SDL</code></td><td>SDL3 core library</td></tr>
+              <tr><td><code>third_party/SDL_image</code></td><td>Image loading support</td></tr>
+              <tr><td><code>third_party/SDL_mixer</code></td><td>Audio mixing and playback</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="cmake">cmake/ — Build Modules</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>cmake/ThirdPartySDL.cmake</code></td><td>Defines <code>configure_vendored_sdl()</code> function for the SDL submodule build</td></tr>
+              <tr><td><code>cmake/EmscriptenToolchain.md</code></td><td>Documentation for the Emscripten/WebAssembly build</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="android-dir">android/ — Android Build</h2>
+        <div class="file-tree">
+<span class="dir">android/</span>
+├── <span class="dir">app/</span>
+│   ├── <span class="dir">src/main/</span>
+│   │   ├── <span class="dir">assets/</span>          <span class="note">Symlinks to gamefiles/</span>
+│   │   ├── <span class="file">AndroidManifest.xml</span>
+│   │   └── <span class="file">freeapi_android_assets.txt</span>  <span class="note">Asset manifest for FreeApi</span>
+│   └── <span class="file">build.gradle</span>
+├── <span class="file">build.gradle</span>         <span class="note">Root Gradle file</span>
+├── <span class="file">local.properties.template</span>
+└── <span class="file">gradlew</span>              <span class="note">Gradle wrapper</span>
+        </div>
+
+        <h2 id="legacy">Legacy and Reference Files</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Directory/File</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>dxsdk3/</code></td><td>DirectX 3 SDK (git submodule) — reference for original API; needed for native DirectX builds</td></tr>
+              <tr><td><code>msvc5/</code></td><td>Legacy MSVC 5 project files — historical reference only</td></tr>
+              <tr><td><code>bass/</code></td><td>BASS and BASSMIDI audio library binaries — used when <code>_BASS=TRUE</code></td></tr>
+              <tr><td><code>resource/</code></td><td>Windows resource files (.rc, .cur, .ico) for the Win32 executable</td></tr>
+              <tr><td><code>util/</code></td><td>Utility scripts (Python) — purpose needs verification</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="architecture.html">← <span class="pnl-label">Architecture</span></a>
+          <a class="page-nav-link next" href="gameplay.html"><span class="pnl-label">Gameplay Overview</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('project-structure');</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reference Index — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Reference</span>
+        </nav>
+
+        <h1>Reference Index</h1>
+        <p>
+          Complete reference tables for all constants, enums, and data structures
+          defined in <code>include/def.hpp</code> and <code>include/decor.hpp</code>.
+          All content migrated from <code>DOC.md</code>.
+        </p>
+
+        <div class="card-grid">
+          <a class="card" href="action-codes.html">
+            <div class="card-icon">🎬</div>
+            <h3>Action Codes (ACTION_*)</h3>
+            <p>All 87 character animation/behavior states.</p>
+          </a>
+          <a class="card" href="object-types.html">
+            <div class="card-icon">🎯</div>
+            <h3>Object Types (TYPE_*)</h3>
+            <p>All 203 moving object types — enemies, bombs, vehicles, items, effects.</p>
+          </a>
+          <a class="card" href="sound-effects.html">
+            <div class="card-icon">🔊</div>
+            <h3>Sound Effects (SOUND_*)</h3>
+            <p>All 93 sound effect constants plus music marker.</p>
+          </a>
+          <a class="card" href="game-phases.html">
+            <div class="card-icon">🔄</div>
+            <h3>Game Phases (WM_PHASE_*)</h3>
+            <p>All 60+ game phase constants for screen/mode control.</p>
+          </a>
+          <a class="card" href="image-channels.html">
+            <div class="card-icon">🖼️</div>
+            <h3>Image Channels</h3>
+            <p>The 15 DirectDraw render channels and their asset files.</p>
+          </a>
+          <a class="card" href="data-structures.html">
+            <div class="card-icon">📦</div>
+            <h3>Data Structures</h3>
+            <p>DescSave, MoveObject, NetPacket, NetMessage, DescFile, Cellule.</p>
+          </a>
+          <a class="card" href="compile-flags.html">
+            <div class="card-icon">🏁</div>
+            <h3>Compile Flags</h3>
+            <p>All compile-time feature flags and SEC_* power-up states.</p>
+          </a>
+          <a class="card" href="game-constants.html">
+            <div class="card-icon">📐</div>
+            <h3>Game Constants</h3>
+            <p>Dimensions, limits, scrolling, and character offset constants.</p>
+          </a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('ref-index');</script>
+</body>
+</html>

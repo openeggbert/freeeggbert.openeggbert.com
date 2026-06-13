@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build &amp; Compile — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Build &amp; Compile</span>
+        </nav>
+
+        <h1>Build &amp; Compile</h1>
+        <p>Free Eggbert supports multiple build systems and targets. The recommended approach is CMake with the FreeDirect backend.</p>
+
+        <h2 id="cmake">CMake (Recommended — Cross-platform)</h2>
+        <p>
+          The canonical cross-platform build uses the <strong>Free Direct</strong> backend,
+          which replaces DirectDraw/DirectSound with SDL3-based equivalents.
+        </p>
+
+        <h3 id="cmake-configure">Configure and Build</h3>
+        <pre><code><span class="cmt"># 1. Initialize submodules</span>
+git submodule update --init --recursive
+
+<span class="cmt"># 2. Configure</span>
+cmake -S . -B build -DSPEEDY_BLUPI_BACKEND=FREEDIRECT
+
+<span class="cmt"># 3. Build</span>
+cmake --build build -j</code></pre>
+
+        <h3 id="cmake-system-sdl">System SDL Override (Advanced)</h3>
+        <p>
+          If you prefer to use system-installed SDL packages instead of the vendored submodules:
+        </p>
+        <pre><code>cmake -S . -B build -DSPEEDY_BLUPI_BACKEND=FREEDIRECT -DFREE_USE_SYSTEM_SDL=ON</code></pre>
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Advanced Users Only</div>
+            <code>FREE_USE_SYSTEM_SDL=ON</code> requires compatible SDL3, SDL3_image, and SDL3_mixer
+            packages to be installed system-wide. The default vendored build is preferred.
+          </div>
+        </div>
+
+        <h3 id="cmake-dependency-boundaries">Dependency Boundaries</h3>
+        <p>The intended dependency chain is strictly layered:</p>
+        <pre><code><span class="cmt">Free Eggbert game code</span>
+        ↓
+<span class="cmt">Free API / Free Direct public compatibility headers</span>
+        ↓
+<span class="cmt">Free API / Free Direct implementation</span>
+        ↓
+<span class="cmt">SDL3 / SDL_image / SDL_mixer internals</span></code></pre>
+        <ul>
+          <li><code>SPEEDY_BLUPI_WINDOWS</code> links only <code>free-api</code> and <code>free-direct</code></li>
+          <li>SDL include directories and libraries stay <strong>private</strong> to <code>free-api</code> / <code>free-direct</code></li>
+          <li>No game source file should include SDL headers directly</li>
+        </ul>
+
+        <h3 id="cmake-compiler-options">Non-MSVC Compiler Options</h3>
+        <p>
+          Because the codebase originates from decompiled code, it uses constructs that
+          modern C++ compilers reject by default. The following permissive flags are applied:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Flag</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>-fpermissive</code></td><td>Allow constructs rejected by strict C++</td></tr>
+              <tr><td><code>-fms-extensions</code></td><td>Enable Microsoft extensions</td></tr>
+              <tr><td><code>-fPIC</code></td><td>Position-independent code</td></tr>
+              <tr><td><code>-w</code></td><td>Suppress all warnings</td></tr>
+              <tr><td><code>-Wno-narrowing</code></td><td>Allow narrowing conversions</td></tr>
+              <tr><td><code>-Wno-int-to-pointer-cast</code></td><td>Allow int-to-pointer casts</td></tr>
+              <tr><td><code>-g</code></td><td>Generate debug symbols</td></tr>
+              <tr><td><code>-O0</code></td><td>No optimization (easier debugging)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="visual-studio">Visual Studio 2022 (Windows, Native DirectX)</h2>
+        <p>For building against the original DirectX 3 SDK on Windows:</p>
+
+        <ol>
+          <li>Open <code>Speedy Eggbert 2 Source.sln</code> in <strong>Visual Studio 2022</strong></li>
+          <li>Set the platform to <strong>x86</strong></li>
+          <li>Set the debugger target to <strong>Win32</strong></li>
+          <li>Open <em>Project Properties → C/C++ → Command Line → Additional Options</em><br>
+            Add: <code>/wd4700 /wd4703</code></li>
+          <li>Open <em>Project Properties → General → Platform Toolset</em><br>
+            Set to: <strong>Visual Studio 2022 (v143)</strong></li>
+          <li>Right-click the solution → <strong>Build Solution</strong></li>
+        </ol>
+
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            <div class="callout-title">/wd4700 /wd4703 Flags</div>
+            These suppress warnings about potentially uninitialized local variables.
+            Such warnings are widespread in decompiled code because the original compiler
+            used register allocation that reused stack space in ways the decompiler cannot
+            always reconstruct correctly.
+          </div>
+        </div>
+
+        <h3 id="known-workaround">Known Workaround for COM Header Error</h3>
+        <p>On some Windows SDK versions, you may encounter:</p>
+        <pre><code>c:\program files (x86)\windows kits\8.1\include\um\combaseapi.h(229):
+error C2760: syntax error: unexpected token 'identifier', expected 'type specifier'</code></pre>
+        <p>The workaround is to add this before the problematic include:</p>
+        <pre><code><span class="kw">typedef struct</span> IUnknown IUnknown;</code></pre>
+
+        <h2 id="emscripten">WebAssembly (Emscripten)</h2>
+        <p>Free Eggbert can be compiled to WebAssembly for running in a browser.</p>
+
+        <h3 id="emscripten-setup">Setup</h3>
+        <p>First, install and activate the <a href="https://emscripten.org/docs/getting_started/downloads.html">Emscripten SDK</a>:</p>
+        <pre><code>source /path/to/emsdk/emsdk_env.sh</code></pre>
+
+        <h3 id="emscripten-build">Build and Run</h3>
+        <pre><code><span class="cmt"># Configure for WebAssembly</span>
+emcmake cmake -S . -B cmake-build-web -DCMAKE_BUILD_TYPE=Debug
+
+<span class="cmt"># Build</span>
+cmake --build cmake-build-web -j
+
+<span class="cmt"># Run in browser (starts local HTTP server)</span>
+emrun cmake-build-web/bin/SPEEDY_BLUPI_WINDOWS.html</code></pre>
+
+        <p>
+          Game assets from <code>gamefiles/</code> (DATA, IMAGE08, IMAGE16, SOUND) are
+          <strong>preloaded into the Emscripten virtual filesystem</strong> at build time —
+          no manual copying is required.
+        </p>
+
+        <h3 id="emscripten-saves">Persistent Saves on Web</h3>
+        <p>
+          Save data is stored in <strong>IndexedDB</strong> via Emscripten's IDBFS,
+          mounted at <code>/save</code> inside the virtual filesystem.
+          Data persists across page reloads. Clearing browser site data resets to defaults.
+        </p>
+        <pre><code><span class="cmt">// Export /save to IndexedDB (from browser console)</span>
+Module.ccall(<span class="str">'FreeEggbert_ExportPersistentData'</span>, null, [], []);
+
+<span class="cmt">// Restore /save from IndexedDB</span>
+Module.ccall(<span class="str">'FreeEggbert_ImportPersistentData'</span>, null, [], []);</code></pre>
+        <p>
+          These functions are defined in <code>src/web_persistence.cpp</code> and exported
+          via <code>EMSCRIPTEN_KEEPALIVE</code>. On non-Emscripten builds, the file is empty.
+        </p>
+
+        <h2 id="android">Android (NDK + Gradle)</h2>
+        <p>See <a href="platform-support.html#android">Platform Support → Android</a> for the full Android build guide.</p>
+
+        <h2 id="cmake-windows-vs-generator">CMake with Visual Studio Generator</h2>
+        <p>When using CMake with the Visual Studio generator on Windows:</p>
+        <pre><code>git submodule update --init --recursive
+cmake -S . -B build -G <span class="str">"Visual Studio 17 2022"</span> -DSPEEDY_BLUPI_BACKEND=FREEDIRECT
+cmake --build build --config Debug</code></pre>
+
+        <h2 id="todo-build">Build TODO Items</h2>
+        <div class="callout verify">
+          <span class="callout-icon">🔍</span>
+          <div class="callout-body">
+            <div class="callout-title">Needs Verification</div>
+            The following build behaviors have been documented but need explicit verification:
+            <ul class="mb-0">
+              <li>Clean checkout builds without system SDL packages on Linux</li>
+              <li><code>FREE_USE_SYSTEM_SDL=ON</code> still works as an override</li>
+              <li><code>free-api</code> and <code>free-direct</code> link SDL as <code>PRIVATE</code> (not <code>PUBLIC</code>)</li>
+              <li>No game source file contains direct SDL usage (<code>#include &lt;SDL...&gt;</code>)</li>
+              <li>Whether <code>/permissive-</code> is appropriate for decompiled MSVC code</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="getting-started.html">← <span class="pnl-label">Getting Started</span></a>
+          <a class="page-nav-link next" href="running.html"><span class="pnl-label">Running the Game</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('build');</script>
+</body>
+</html>

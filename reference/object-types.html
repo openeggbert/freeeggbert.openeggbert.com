@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Object Types — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Reference</a>
+          <span class="sep">/</span>
+          <span class="current">Object Types</span>
+        </nav>
+
+        <h1>Object Types (TYPE_*)</h1>
+        <p>
+          Moving game objects — enemies, items, effects, vehicles, and bombs — are identified by
+          <code>TYPE_*</code> constants (values 1–203). Defined in <code>include/def.hpp</code>.
+          Objects are tracked in <code>MoveObject</code> structs and managed by <code>CDecor</code>
+          via the <code>moveObject[200]</code> array in <code>src/decmove.cpp</code>.
+        </p>
+
+        <h2 id="lifts">Lifts and Elevators</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>TYPE_ASCENSEUR</code></td><td>1</td><td>Standard lift/elevator</td></tr>
+              <tr><td><code>TYPE_ASCENSEURs</code></td><td>47</td><td>Conveyor belt moving right</td></tr>
+              <tr><td><code>TYPE_ASCENSEURsi</code></td><td>48</td><td>Conveyor belt moving left</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="enemies">Enemies</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>TYPE_POISSON</code></td><td>17</td><td>Fish (aquatic enemy)</td></tr>
+              <tr><td><code>TYPE_OISEAU</code></td><td>20</td><td>Bird (aerial enemy)</td></tr>
+              <tr><td><code>TYPE_GUEPE</code></td><td>44</td><td>Wasp (stings Blupi → ACTION_BALLOON)</td></tr>
+              <tr><td><code>TYPE_TENTACULE</code></td><td>53</td><td>Slime tentacle effect</td></tr>
+              <tr><td><code>TYPE_CREATURE</code></td><td>54</td><td>Moving slime creature</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="bombs">Bombs and Explosions</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>TYPE_BOMBEDOWN</code></td><td>2</td><td>Floor bomb</td></tr>
+              <tr><td><code>TYPE_BOMBEUP</code></td><td>3</td><td>Hanging bomb</td></tr>
+              <tr><td><code>TYPE_BOMBEMOVE</code></td><td>16</td><td>Moving bomb (patrols a path)</td></tr>
+              <tr><td><code>TYPE_BOMBEFOLLOW1</code></td><td>96</td><td>Homing bomb (stopped)</td></tr>
+              <tr><td><code>TYPE_BOMBEFOLLOW2</code></td><td>97</td><td>Homing bomb (moving — tracks player)</td></tr>
+              <tr><td><code>TYPE_DYNAMITE</code></td><td>55</td><td>Dynamite stick (inert)</td></tr>
+              <tr><td><code>TYPE_DYNAMITEf</code></td><td>56</td><td>Lit dynamite (fuse burning)</td></tr>
+              <tr><td><code>TYPE_BOMBEPERSO1</code></td><td>200</td><td>Player 1 personal bomb (yellow)</td></tr>
+              <tr><td><code>TYPE_BOMBEPERSO2</code></td><td>201</td><td>Player 2 personal bomb (orange)</td></tr>
+              <tr><td><code>TYPE_BOMBEPERSO3</code></td><td>202</td><td>Player 3 personal bomb (blue)</td></tr>
+              <tr><td><code>TYPE_BOMBEPERSO4</code></td><td>203</td><td>Player 4 personal bomb (green)</td></tr>
+              <tr><td><code>TYPE_EXPLO1</code>–<code>TYPE_EXPLO4</code></td><td>8–11</td><td>Explosion effects 1–4</td></tr>
+              <tr><td><code>TYPE_EXPLO5</code>–<code>TYPE_EXPLO10</code></td><td>90–95</td><td>Explosion effects 5–10</td></tr>
+              <tr><td><code>TYPE_SPLOUTCH1</code>–<code>TYPE_SPLOUTCH3</code></td><td>98–100</td><td>Splat particle effects</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="collectibles">Collectibles and Keys</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>TYPE_TRESOR</code></td><td>5</td><td>Treasure (collectible — increments nbTresor)</td></tr>
+              <tr><td><code>TYPE_EGG</code></td><td>6</td><td>Egg collectible</td></tr>
+              <tr><td><code>TYPE_CLE</code></td><td>21</td><td>Gold key</td></tr>
+              <tr><td><code>TYPE_CLE1</code></td><td>49</td><td>Red key</td></tr>
+              <tr><td><code>TYPE_CLE2</code></td><td>50</td><td>Green key</td></tr>
+              <tr><td><code>TYPE_CLE3</code></td><td>51</td><td>Blue key</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="doors-goals">Doors and Goals</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>TYPE_DOOR</code></td><td>22</td><td>Door (opened with matching key)</td></tr>
+              <tr><td><code>TYPE_GOAL</code></td><td>7</td><td>Goal/exit marker (triggers WM_PHASE_WIN)</td></tr>
+              <tr><td><code>TYPE_BRIDGE</code></td><td>52</td><td>Fragile bridge (collapses when walked on)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="vehicles">Vehicles</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>TYPE_HELICO</code></td><td>13</td><td>Helicopter (empty)</td></tr>
+              <tr><td><code>TYPE_BLUPIHELICO</code></td><td>32</td><td>Blupi inside helicopter</td></tr>
+              <tr><td><code>TYPE_JEEP</code></td><td>19</td><td>Jeep</td></tr>
+              <tr><td><code>TYPE_TANK</code></td><td>28</td><td>Tank (empty)</td></tr>
+              <tr><td><code>TYPE_BLUPITANK</code></td><td>33</td><td>Blupi inside tank</td></tr>
+              <tr><td><code>TYPE_OVER</code></td><td>46</td><td>Hovercraft</td></tr>
+              <tr><td><code>TYPE_BULLDOZER</code></td><td>4</td><td>Bulldozer</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="interactive">Interactive Items and Pick-ups</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>TYPE_CAISSE</code></td><td>12</td><td>Crate (pushable/pullable box)</td></tr>
+              <tr><td><code>TYPE_SKATE</code></td><td>24</td><td>Skateboard (pick up or drop)</td></tr>
+              <tr><td><code>TYPE_DRINK</code></td><td>30</td><td>Drinkable item</td></tr>
+              <tr><td><code>TYPE_CHARGE</code></td><td>31</td><td>Charging device</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="power-ups">Power-up Effects</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>TYPE_SHIELD</code></td><td>25</td><td>Shield power-up (SEC_SHIELD)</td></tr>
+              <tr><td><code>TYPE_POWER</code></td><td>26</td><td>Lollipop power-up (SEC_POWER)</td></tr>
+              <tr><td><code>TYPE_MAGICTRACK</code></td><td>27</td><td>Sparkle trail</td></tr>
+              <tr><td><code>TYPE_TRESORTRACK</code></td><td>39</td><td>Treasure sparkle trail</td></tr>
+              <tr><td><code>TYPE_SHIELDTRACK</code></td><td>57</td><td>Shield particle trail</td></tr>
+              <tr><td><code>TYPE_HIDETRACK</code></td><td>58</td><td>Invisibility particle trail</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="water">Water Effects</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>TYPE_PLOUF</code></td><td>14</td><td>Big water splash</td></tr>
+              <tr><td><code>TYPE_TIPLOUF</code></td><td>35</td><td>Small water splash</td></tr>
+              <tr><td><code>TYPE_BLUP</code></td><td>15</td><td>Underwater bubble</td></tr>
+              <tr><td><code>TYPE_GLU</code></td><td>34</td><td>Glue blob (traps player)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="hazards">Hazards</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>TYPE_BALLE</code></td><td>23</td><td>Glue ball projectile (traps in ACTION_GLU)</td></tr>
+              <tr><td><code>TYPE_BULLET</code></td><td>29</td><td>Tank bullet</td></tr>
+              <tr><td><code>TYPE_POLLUTION</code></td><td>36</td><td>Pollution/toxic zone</td></tr>
+              <tr><td><code>TYPE_ELECTRO</code></td><td>38</td><td>Shocked Blupi effect</td></tr>
+              <tr><td><code>TYPE_CLEAR</code></td><td>37</td><td>Burned Blupi effect</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="special">Special Effects</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>TYPE_INVERT</code></td><td>40</td><td>Controls inversion (active — sets blupiInvert)</td></tr>
+              <tr><td><code>TYPE_INVERTSTART</code></td><td>41</td><td>Controls inversion start animation</td></tr>
+              <tr><td><code>TYPE_INVERTSTOP</code></td><td>42</td><td>Controls inversion end animation</td></tr>
+              <tr><td><code>TYPE_INVERTSPIN</code></td><td>43</td><td>Controls inversion spin effect</td></tr>
+              <tr><td><code>TYPE_TOMATES</code></td><td>18</td><td>Tomatoes (unused)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="action-codes.html">← <span class="pnl-label">Action Codes</span></a>
+          <a class="page-nav-link next" href="sound-effects.html"><span class="pnl-label">Sound Effects</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('object-types');</script>
+</body>
+</html>

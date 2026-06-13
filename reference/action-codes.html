@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Action Codes — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Reference</a>
+          <span class="sep">/</span>
+          <span class="current">Action Codes</span>
+        </nav>
+
+        <h1>Action Codes (ACTION_*)</h1>
+        <p>
+          Character animation states are selected by <code>ACTION_*</code> constants
+          defined in <code>include/def.hpp</code>. There are 87 action codes (values 1–87).
+          They control which sprite animation plays and often also drive physics behavior
+          in <code>src/decblupi.cpp</code>.
+        </p>
+
+        <h2 id="movement">Movement</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>ACTION_STOP</code></td><td>1</td><td>Standing still</td></tr>
+              <tr><td><code>ACTION_MARCH</code></td><td>2</td><td>Walking</td></tr>
+              <tr><td><code>ACTION_TURN</code></td><td>3</td><td>Turning around</td></tr>
+              <tr><td><code>ACTION_JUMP</code></td><td>4</td><td>Beginning to jump</td></tr>
+              <tr><td><code>ACTION_AIR</code></td><td>5</td><td>In the air (mid-jump)</td></tr>
+              <tr><td><code>ACTION_DOWN</code></td><td>6</td><td>Looking down</td></tr>
+              <tr><td><code>ACTION_UP</code></td><td>7</td><td>Looking up</td></tr>
+              <tr><td><code>ACTION_VERTIGO</code></td><td>8</td><td>"Whoops" — edge vertigo</td></tr>
+              <tr><td><code>ACTION_RECEDE</code></td><td>9</td><td>Backing away from edge</td></tr>
+              <tr><td><code>ACTION_ADVANCE</code></td><td>10</td><td>Walking forward away from edge</td></tr>
+              <tr><td><code>ACTION_STOPMARCH</code></td><td>60</td><td>Stopped from walking</td></tr>
+              <tr><td><code>ACTION_STOPJUMP</code></td><td>61</td><td>Stopped from jumping</td></tr>
+              <tr><td><code>ACTION_STOPJUMPh</code></td><td>62</td><td>Stopped from jump (variant)</td></tr>
+              <tr><td><code>ACTION_TELEPORTE</code></td><td>74</td><td>Teleporting</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="helicopter">Helicopter</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>ACTION_STOPHELICO</code></td><td>15</td><td>Hovering (helicopter stopped)</td></tr>
+              <tr><td><code>ACTION_MARCHHELICO</code></td><td>16</td><td>Flying (helicopter moving)</td></tr>
+              <tr><td><code>ACTION_TURNHELICO</code></td><td>17</td><td>Turning in helicopter</td></tr>
+              <tr><td><code>ACTION_HELICOGLU</code></td><td>58</td><td>Glued while in helicopter</td></tr>
+              <tr><td><code>ACTION_TURNAIR</code></td><td>59</td><td>Turning in mid-air</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="swimming">Swimming</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>ACTION_STOPNAGE</code></td><td>18</td><td>Stopped in deep water</td></tr>
+              <tr><td><code>ACTION_MARCHNAGE</code></td><td>19</td><td>Swimming in deep water</td></tr>
+              <tr><td><code>ACTION_TURNNAGE</code></td><td>20</td><td>Turning in deep water</td></tr>
+              <tr><td><code>ACTION_STOPSURF</code></td><td>21</td><td>Stopped at water surface</td></tr>
+              <tr><td><code>ACTION_MARCHSURF</code></td><td>22</td><td>Swimming at surface</td></tr>
+              <tr><td><code>ACTION_TURNSURF</code></td><td>23</td><td>Turning at surface</td></tr>
+              <tr><td><code>ACTION_DROWN</code></td><td>24</td><td>Drowning</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="jeep">Jeep</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>ACTION_STOPJEEP</code></td><td>25</td><td>Jeep stopped</td></tr>
+              <tr><td><code>ACTION_MARCHJEEP</code></td><td>26</td><td>Jeep moving</td></tr>
+              <tr><td><code>ACTION_TURNJEEP</code></td><td>27</td><td>Jeep turning</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="crate">Crate Pushing / Pulling</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>ACTION_PUSH</code></td><td>14</td><td>Pushing a crate</td></tr>
+              <tr><td><code>ACTION_STOPPOP</code></td><td>28</td><td>Stopped while pulling crate</td></tr>
+              <tr><td><code>ACTION_POP</code></td><td>29</td><td>Pulling crate</td></tr>
+              <tr><td><code>ACTION_OUF3</code></td><td>47</td><td>Stop moving crate ("gahh!")</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="bars">Bar Hanging</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>ACTION_STOPSUSPEND</code></td><td>31</td><td>Stopped on bars</td></tr>
+              <tr><td><code>ACTION_MARCHSUSPEND</code></td><td>32</td><td>Moving on bars</td></tr>
+              <tr><td><code>ACTION_TURNSUSPEND</code></td><td>33</td><td>Turning on bars</td></tr>
+              <tr><td><code>ACTION_JUMPSUSPEND</code></td><td>34</td><td>Pulling up from bars</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="skateboard">Skateboard</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>ACTION_STOPSKATE</code></td><td>37</td><td>Skateboard stopped</td></tr>
+              <tr><td><code>ACTION_MARCHSKATE</code></td><td>38</td><td>Skateboarding</td></tr>
+              <tr><td><code>ACTION_TURNSKATE</code></td><td>39</td><td>Turning on skateboard</td></tr>
+              <tr><td><code>ACTION_JUMPSKATE</code></td><td>40</td><td>Jumping on skateboard</td></tr>
+              <tr><td><code>ACTION_AIRSKATE</code></td><td>41</td><td>In air on skateboard</td></tr>
+              <tr><td><code>ACTION_TAKESKATE</code></td><td>42</td><td>Picking up skateboard</td></tr>
+              <tr><td><code>ACTION_DEPOSESKATE</code></td><td>43</td><td>Dropping skateboard</td></tr>
+              <tr><td><code>ACTION_SLOWDOWNSKATE</code></td><td>85</td><td>Slowing down on skateboard</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="tank">Tank</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>ACTION_STOPTANK</code></td><td>50</td><td>Tank stopped</td></tr>
+              <tr><td><code>ACTION_MARCHTANK</code></td><td>51</td><td>Tank moving</td></tr>
+              <tr><td><code>ACTION_TURNTANK</code></td><td>52</td><td>Tank turning</td></tr>
+              <tr><td><code>ACTION_FIRETANK</code></td><td>53</td><td>Tank firing</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="hovercraft">Hovercraft</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>ACTION_STOPOVER</code></td><td>67</td><td>Hovercraft stopped</td></tr>
+              <tr><td><code>ACTION_MARCHOVER</code></td><td>68</td><td>Hovercraft moving</td></tr>
+              <tr><td><code>ACTION_TURNOVER</code></td><td>69</td><td>Hovercraft turning</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="power-ups">Power-Up Actions</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>ACTION_SUCETTE</code></td><td>49</td><td>Eating lollipop (power boost)</td></tr>
+              <tr><td><code>ACTION_GLU</code></td><td>54</td><td>Glued (trapped by glue ball)</td></tr>
+              <tr><td><code>ACTION_DRINK</code></td><td>55</td><td>Drinking</td></tr>
+              <tr><td><code>ACTION_CHARGE</code></td><td>56</td><td>Charging up</td></tr>
+              <tr><td><code>ACTION_ELECTRO</code></td><td>57</td><td>Electrocuted</td></tr>
+              <tr><td><code>ACTION_BALLOON</code></td><td>66</td><td>Stung by wasp (swells up)</td></tr>
+              <tr><td><code>ACTION_HIDE</code></td><td>35</td><td>Invisible (cloud power-up)</td></tr>
+              <tr><td><code>ACTION_STOPECRASE</code></td><td>72</td><td>Stopped while flattened</td></tr>
+              <tr><td><code>ACTION_MARCHECRASE</code></td><td>73</td><td>Moving while flattened/squished</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="reactions">Reactions and Expressions</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>ACTION_WIN</code></td><td>13</td><td>Victory animation</td></tr>
+              <tr><td><code>ACTION_BYE</code></td><td>30</td><td>"au au" farewell</td></tr>
+              <tr><td><code>ACTION_JUMPAIE</code></td><td>36</td><td>Headache ("aie!")</td></tr>
+              <tr><td><code>ACTION_OUF1a</code></td><td>44</td><td>Relief expression 1a</td></tr>
+              <tr><td><code>ACTION_OUF1b</code></td><td>45</td><td>Relief expression 1b</td></tr>
+              <tr><td><code>ACTION_OUF2</code></td><td>46</td><td>Relief expression 2</td></tr>
+              <tr><td><code>ACTION_OUF4</code></td><td>48</td><td>Relief expression 4</td></tr>
+              <tr><td><code>ACTION_OUF5</code></td><td>65</td><td>Relief expression 5</td></tr>
+              <tr><td><code>ACTION_MOCKERY</code></td><td>63</td><td>Mockery animation</td></tr>
+              <tr><td><code>ACTION_MOCKERYi</code></td><td>64</td><td>Mockery variant i</td></tr>
+              <tr><td><code>ACTION_MOCKERYp</code></td><td>83</td><td>Mockery variant p</td></tr>
+              <tr><td><code>ACTION_NON</code></td><td>84</td><td>Can't place personal bomb</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="dynamite">Dynamite</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>ACTION_TAKEDYNAMITE</code></td><td>86</td><td>Picking up dynamite</td></tr>
+              <tr><td><code>ACTION_PUTDYNAMITE</code></td><td>87</td><td>Placing dynamite</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="utility">Utility / Unused</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>ACTION_CLEAR1</code></td><td>11</td><td>Clear animation 1</td></tr>
+              <tr><td><code>ACTION_SET</code></td><td>12</td><td>Set state</td></tr>
+              <tr><td><code>ACTION_CLEAR2</code>–<code>ACTION_CLEAR8</code></td><td>75–81</td><td>Unused clear animations</td></tr>
+              <tr><td><code>ACTION_SWITCH</code></td><td>82</td><td>Switch action</td></tr>
+              <tr><td><code>ACTION_RECEDEq</code></td><td>70</td><td>Recede quick</td></tr>
+              <tr><td><code>ACTION_ADVANCEq</code></td><td>71</td><td>Advance quick</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="index.html">← <span class="pnl-label">Reference Index</span></a>
+          <a class="page-nav-link next" href="object-types.html"><span class="pnl-label">Object Types</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('action-codes');</script>
+</body>
+</html>

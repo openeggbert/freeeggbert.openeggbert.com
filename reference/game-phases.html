@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Phases — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Reference</a>
+          <span class="sep">/</span>
+          <span class="current">Game Phases</span>
+        </nav>
+
+        <h1>Game Phases (WM_PHASE_*)</h1>
+        <p>
+          Game phases control which screen or mode is active. They are dispatched as Windows messages
+          and handled by <code>CEvent</code> in <code>src/event.cpp</code>.
+          All 67 phases are defined as an enum in <code>include/def.hpp</code>, starting at
+          <code>WM_PHASE_INIT = WM_USER + 500</code> and ending at
+          <code>WM_PHASE_INTRO2 = WM_USER + 566</code>.
+        </p>
+
+        <h2 id="core">Core Gameplay</h2>
+        <div class="table-wrap"><table><thead><tr><th>Phase</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>WM_PHASE_INIT</code></td><td>WM_USER+500</td><td>Initialization / startup</td></tr>
+          <tr><td><code>WM_PHASE_PLAY</code></td><td>WM_USER+501</td><td>Normal gameplay</td></tr>
+          <tr><td><code>WM_PHASE_BUILD</code></td><td>WM_USER+502</td><td>Level editor / design mode</td></tr>
+          <tr><td><code>WM_PHASE_PLAYTEST</code></td><td>WM_USER+506</td><td>Test play from the level editor</td></tr>
+          <tr><td><code>WM_PHASE_1531</code></td><td>WM_USER+507</td><td>Unknown/unnamed phase (decompilation artifact)</td></tr>
+          <tr><td><code>WM_PHASE_DOPLAY</code></td><td>WM_USER+515</td><td>Start single-player game</td></tr>
+          <tr><td><code>WM_PHASE_DEMO</code></td><td>WM_USER+533</td><td>Demo playback (attract mode)</td></tr>
+          <tr><td><code>WM_PHASE_STOP</code></td><td>WM_USER+558</td><td>Escape key pause menu during gameplay (comment in source)</td></tr>
+          <tr><td><code>WM_PHASE_QUITPLAY</code></td><td>WM_USER+563</td><td>Exit play back to main menu</td></tr>
+          <tr><td><code>WM_PHASE_1588</code></td><td>WM_USER+564</td><td>Unknown/unnamed phase (decompilation artifact)</td></tr>
+        </tbody></table></div>
+
+        <h2 id="win-lose">Win / Lose</h2>
+        <div class="table-wrap"><table><thead><tr><th>Phase</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>WM_PHASE_WIN</code></td><td>WM_USER+508</td><td>Level won</td></tr>
+          <tr><td><code>WM_PHASE_LOST</code></td><td>WM_USER+509</td><td>Level lost</td></tr>
+          <tr><td><code>WM_PHASE_WINMOVIE</code></td><td>WM_USER+513</td><td>Win cutscene</td></tr>
+          <tr><td><code>WM_PHASE_1539</code></td><td>WM_USER+514</td><td>Unknown/unnamed phase (decompilation artifact)</td></tr>
+          <tr><td><code>WM_PHASE_LASTWIN</code></td><td>WM_USER+516</td><td>Last win — Planet Blupi vestige (comment in source)</td></tr>
+          <tr><td><code>WM_PHASE_LOSTMULTI</code></td><td>WM_USER+525</td><td>Multiplayer: lost</td></tr>
+          <tr><td><code>WM_PHASE_WINMULTI</code></td><td>WM_USER+526</td><td>Multiplayer: won</td></tr>
+          <tr><td><code>WM_PHASE_WINMOVIEMULTI</code></td><td>WM_USER+527</td><td>Multiplayer: win cutscene</td></tr>
+          <tr><td><code>WM_PHASE_WINDESIGN</code></td><td>WM_USER+522</td><td>Editor test: won</td></tr>
+          <tr><td><code>WM_PHASE_LOSTDESIGN</code></td><td>WM_USER+523</td><td>Editor test: lost</td></tr>
+          <tr><td><code>WM_PHASE_WINMOVIEDESIGN</code></td><td>WM_USER+524</td><td>Editor test: win cutscene</td></tr>
+        </tbody></table></div>
+
+        <h2 id="menus">Menus and UI</h2>
+        <div class="table-wrap"><table><thead><tr><th>Phase</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>WM_PHASE_SETUP</code></td><td>WM_USER+510</td><td>Settings screen</td></tr>
+          <tr><td><code>WM_PHASE_MUSIC</code></td><td>WM_USER+511</td><td>Music selection screen</td></tr>
+          <tr><td><code>WM_PHASE_PLAYMOVIE</code></td><td>WM_USER+512</td><td>Play intro movie</td></tr>
+          <tr><td><code>WM_PHASE_SETUPp</code></td><td>WM_USER+517</td><td>Settings screen (alternate variant)</td></tr>
+          <tr><td><code>WM_PHASE_REGION</code></td><td>WM_USER+518</td><td>Region selection screen</td></tr>
+          <tr><td><code>WM_PHASE_INSERT</code></td><td>WM_USER+519</td><td>Insert CD (CD check screen, requires <code>_CD=TRUE</code>)</td></tr>
+          <tr><td><code>WM_PHASE_INFO</code></td><td>WM_USER+505</td><td>Info / statistics screen</td></tr>
+          <tr><td><code>WM_PHASE_HELP</code></td><td>WM_USER+559</td><td>Help screen</td></tr>
+          <tr><td><code>WM_PHASE_BYE</code></td><td>WM_USER+532</td><td>Exit / goodbye screen (requires <code>_BYE=TRUE</code>)</td></tr>
+          <tr><td><code>WM_PHASE_INTRO1</code></td><td>WM_USER+565</td><td>Intro animation 1</td></tr>
+          <tr><td><code>WM_PHASE_INTRO2</code></td><td>WM_USER+566</td><td>Intro animation 2</td></tr>
+          <tr><td><code>WM_PHASE_TESTCD</code></td><td>WM_USER+528</td><td>CD presence test</td></tr>
+          <tr><td><code>WM_PHASE_MANUEL</code></td><td>WM_USER+529</td><td>Manual / instructions</td></tr>
+          <tr><td><code>WM_PHASE_PRIVATE</code></td><td>WM_USER+530</td><td>Private / cheat mode</td></tr>
+          <tr><td><code>WM_PHASE_UNDO</code></td><td>WM_USER+531</td><td>Undo — Planet Blupi vestige (comment in source)</td></tr>
+        </tbody></table></div>
+
+        <h2 id="gamer">Gamer Profile Management</h2>
+        <div class="table-wrap"><table><thead><tr><th>Phase</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>WM_PHASE_GAMER</code></td><td>WM_USER+521</td><td>Gamer selection screen</td></tr>
+          <tr><td><code>WM_PHASE_NAMEGAMER</code></td><td>WM_USER+503</td><td>Name a new gamer profile</td></tr>
+          <tr><td><code>WM_PHASE_CLEARGAMER</code></td><td>WM_USER+504</td><td>Clear a gamer profile (confirmation)</td></tr>
+          <tr><td><code>WM_PHASE_DONAMEGAMER</code></td><td>WM_USER+538</td><td>Execute gamer naming</td></tr>
+          <tr><td><code>WM_PHASE_DOCLEARGAMER</code></td><td>WM_USER+539</td><td>Execute gamer profile clear</td></tr>
+        </tbody></table></div>
+
+        <h2 id="editor">Level Editor I/O</h2>
+        <div class="table-wrap"><table><thead><tr><th>Phase</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>WM_PHASE_NAMEDESIGN</code></td><td>WM_USER+534</td><td>Name a custom design level</td></tr>
+          <tr><td><code>WM_PHASE_WRITEDESIGN</code></td><td>WM_USER+535</td><td>Export design to <code>c:\user</code> (legacy path, comment in source)</td></tr>
+          <tr><td><code>WM_PHASE_READDESIGN</code></td><td>WM_USER+536</td><td>Import design from <code>c:\user</code></td></tr>
+          <tr><td><code>WM_PHASE_CLEARDESIGN</code></td><td>WM_USER+537</td><td>Clear the current design</td></tr>
+          <tr><td><code>WM_PHASE_DONAMEDESIGN</code></td><td>WM_USER+540</td><td>Execute design naming</td></tr>
+          <tr><td><code>WM_PHASE_DOWRITEDESIGN</code></td><td>WM_USER+541</td><td>Execute design write</td></tr>
+          <tr><td><code>WM_PHASE_DOREADDESIGN</code></td><td>WM_USER+542</td><td>Execute design read</td></tr>
+          <tr><td><code>WM_PHASE_DOCLEARDESIGN</code></td><td>WM_USER+543</td><td>Execute design clear</td></tr>
+          <tr><td><code>WM_PHASE_QUITPLAYTEST</code></td><td>WM_USER+520</td><td>Exit test play back to editor</td></tr>
+        </tbody></table></div>
+
+        <h2 id="save-load">Save / Load</h2>
+        <div class="table-wrap"><table><thead><tr><th>Phase</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>WM_PHASE_GWRITE</code></td><td>WM_USER+560</td><td>Save game</td></tr>
+          <tr><td><code>WM_PHASE_GREADp</code></td><td>WM_USER+561</td><td>Load game (prompt / slot selection)</td></tr>
+          <tr><td><code>WM_PHASE_GREAD</code></td><td>WM_USER+562</td><td>Load game (execute)</td></tr>
+        </tbody></table></div>
+
+        <h2 id="multiplayer">Multiplayer (DirectPlay)</h2>
+        <div class="table-wrap"><table><thead><tr><th>Phase</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>WM_PHASE_SERVICE</code></td><td>WM_USER+544</td><td>Select DirectPlay transport (IPX, TCP/IP, modem)</td></tr>
+          <tr><td><code>WM_PHASE_DP_DOSERVICE</code></td><td>WM_USER+545</td><td>Execute service selection</td></tr>
+          <tr><td><code>WM_PHASE_DP_CANCELSERVICE</code></td><td>WM_USER+546</td><td>Cancel service selection</td></tr>
+          <tr><td><code>WM_PHASE_SESSION</code></td><td>WM_USER+547</td><td>Session browser</td></tr>
+          <tr><td><code>WM_PHASE_DP_JOIN</code></td><td>WM_USER+548</td><td>Join a session</td></tr>
+          <tr><td><code>WM_PHASE_DP_CREATELOBBY</code></td><td>WM_USER+549</td><td>Create a lobby session</td></tr>
+          <tr><td><code>WM_PHASE_DP_REFRESH</code></td><td>WM_USER+550</td><td>Refresh session list</td></tr>
+          <tr><td><code>WM_PHASE_DP_CANCELSESSION</code></td><td>WM_USER+551</td><td>Cancel session browser</td></tr>
+          <tr><td><code>WM_PHASE_MULTI</code></td><td>WM_USER+552</td><td>Multiplayer lobby (waiting for players)</td></tr>
+          <tr><td><code>WM_PHASE_DP_STARTMULTI</code></td><td>WM_USER+553</td><td>Start the multiplayer game</td></tr>
+          <tr><td><code>WM_PHASE_DP_CANCELMULTI</code></td><td>WM_USER+554</td><td>Cancel multiplayer lobby</td></tr>
+          <tr><td><code>WM_PHASE_CREATE</code></td><td>WM_USER+555</td><td>Create a new session</td></tr>
+          <tr><td><code>WM_PHASE_DP_DOCREATE</code></td><td>WM_USER+556</td><td>Execute session creation</td></tr>
+          <tr><td><code>WM_PHASE_DP_CANCELCREATE</code></td><td>WM_USER+557</td><td>Cancel session creation</td></tr>
+        </tbody></table></div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="sound-effects.html">← <span class="pnl-label">Sound Effects</span></a>
+          <a class="page-nav-link next" href="image-channels.html"><span class="pnl-label">Image Channels</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('game-phases');</script>
+</body>
+</html>

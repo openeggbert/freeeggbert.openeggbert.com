@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Constants — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Reference</a>
+          <span class="sep">/</span>
+          <span class="current">Game Constants</span>
+        </nav>
+
+        <h1>Game Constants</h1>
+        <p>
+          Numeric constants defined in <code>include/def.hpp</code>.
+          These control rendering dimensions, world limits, gameplay parameters, and UI sizing.
+        </p>
+
+        <h2 id="window">Window and Rendering</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>LXIMAGE</code></td><td>640</td><td>Game window width (pixels)</td></tr>
+              <tr><td><code>LYIMAGE</code></td><td>480</td><td>Game window height (pixels)</td></tr>
+              <tr><td><code>POSDRAWX</code></td><td>0</td><td>Draw origin X</td></tr>
+              <tr><td><code>POSDRAWY</code></td><td>0</td><td>Draw origin Y</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="world-grid">World Grid</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>MAXCELX</code></td><td>100</td><td>Max world cells horizontally</td></tr>
+              <tr><td><code>MAXCELY</code></td><td>100</td><td>Max world cells vertically</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="sprite-sizes">Sprite Dimensions</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>DIMOBJX</code></td><td>64</td><td>Object sprite width (px)</td></tr>
+              <tr><td><code>DIMOBJY</code></td><td>64</td><td>Object sprite height (px)</td></tr>
+              <tr><td><code>DIMBLUPIX</code></td><td>60</td><td>Blupi character sprite width (px)</td></tr>
+              <tr><td><code>DIMBLUPIY</code></td><td>60</td><td>Blupi character sprite height (px)</td></tr>
+              <tr><td><code>DIMEXPLOX</code></td><td>128</td><td>Explosion sprite width (px)</td></tr>
+              <tr><td><code>DIMEXPLOY</code></td><td>128</td><td>Explosion sprite height (px)</td></tr>
+              <tr><td><code>DIMBUTTONX</code></td><td>40</td><td>UI button width (px)</td></tr>
+              <tr><td><code>DIMBUTTONY</code></td><td>40</td><td>UI button height (px)</td></tr>
+              <tr><td><code>DIMJAUGEX</code></td><td>124</td><td>Gauge bar width (px)</td></tr>
+              <tr><td><code>DIMJAUGEY</code></td><td>22</td><td>Gauge bar height (px)</td></tr>
+              <tr><td><code>DIMTEXTX</code></td><td>16</td><td>Max character sprite width (px)</td></tr>
+              <tr><td><code>DIMTEXTY</code></td><td>16</td><td>Max character sprite height (px)</td></tr>
+              <tr><td><code>DIMLITTLEX</code></td><td>16</td><td>Small character sprite width (px)</td></tr>
+              <tr><td><code>DIMLITTLEY</code></td><td>12</td><td>Small character sprite height (px)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="game-limits">Multiplayer and Game Limits</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>MAXGAMER</code></td><td>8</td><td>Maximum total gamer profiles</td></tr>
+              <tr><td><code>MAXNETPLAYER</code></td><td>4</td><td>Maximum network players</td></tr>
+              <tr><td><code>MAXTEAM</code></td><td>4</td><td>Maximum teams</td></tr>
+              <tr><td><code>MAXNETMESSAGE</code></td><td>20</td><td>Max pending network messages</td></tr>
+              <tr><td><code>MAXSESSION</code></td><td>100</td><td>Max DirectPlay sessions shown in browser</td></tr>
+              <tr><td><code>MAXMOVEOBJECT</code></td><td>200</td><td>Max simultaneously active moving objects</td></tr>
+              <tr><td><code>MAXNOTIF</code></td><td>5</td><td>Max simultaneous on-screen notifications</td></tr>
+              <tr><td><code>MAXFIFOPOS</code></td><td>10</td><td>FIFO position queue size</td></tr>
+              <tr><td><code>MAXCHAT</code></td><td>6</td><td>Max chat messages visible at once</td></tr>
+              <tr><td><code>MAXSAVE</code></td><td>6</td><td>Max save game slots</td></tr>
+              <tr><td><code>MAXDEMO</code></td><td>9999</td><td>Max demo frames recorded/played back</td></tr>
+              <tr><td><code>MAXINDEX</code></td><td>20</td><td>Max index entries (purpose TBD)</td></tr>
+              <tr><td><code>MAXMESSAGEPERPACKET</code></td><td>5</td><td>Max game events per network packet</td></tr>
+              <tr><td><code>MAXBUTTON</code></td><td>40</td><td>Max UI buttons on screen at once</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="scrolling">Camera Scrolling</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>SCROLL_SPEED</code></td><td>8</td><td>Camera scroll speed (pixels per tick)</td></tr>
+              <tr><td><code>SCROLL_MARGX</code></td><td>80</td><td>Horizontal scroll trigger margin (px from edge)</td></tr>
+              <tr><td><code>SCROLL_MARGY</code></td><td>40</td><td>Vertical scroll trigger margin (px from edge)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="character-offsets">Character Physics Offsets</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>BLUPIFLOOR</code></td><td>2</td><td>Floor contact offset (px)</td></tr>
+              <tr><td><code>BLUPIOFFY</code></td><td>6</td><td>Y offset when standing on floor</td></tr>
+              <tr><td><code>BLUPISURF</code></td><td>12</td><td>Water surface offset (px)</td></tr>
+              <tr><td><code>BLUPISUSPEND</code></td><td>12</td><td>Bar-hanging Y offset (px)</td></tr>
+              <tr><td><code>OVERHEIGHT</code></td><td>80</td><td>Hovercraft flight height above ground (px)</td></tr>
+              <tr><td><code>MAXQUART</code></td><td>441</td><td>Quarter cell count (21×21 grid)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="key-flags">Key Color Flags (CLE_*)</h2>
+        <p>Bit flags used in <code>DescSave::blupiCle</code> to track which colored keys the player holds.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>CLE_RED</code></td><td>1 (bit 0)</td><td>Red key held</td></tr>
+              <tr><td><code>CLE_GREEN</code></td><td>2 (bit 1)</td><td>Green key held</td></tr>
+              <tr><td><code>CLE_BLUE</code></td><td>4 (bit 2)</td><td>Blue key held</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="jauge-slots">Gauge Slots (JAUGE_*)</h2>
+        <p>Indices for the two on-screen gauge slots tracked in <code>DescSave::jaugeHide[]</code>.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>JAUGE_AIR</code></td><td>0</td><td>Air/oxygen gauge (used underwater)</td></tr>
+              <tr><td><code>JAUGE_POWER</code></td><td>1</td><td>Power-up gauge (shield, lollipop, etc.)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="mouse-types">Mouse Cursor Types (MOUSETYPEGRA etc.)</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>MOUSETYPEGRA</code></td><td>1</td><td>Graphical game cursor</td></tr>
+              <tr><td><code>MOUSETYPEWIN</code></td><td>2</td><td>Windows system cursor</td></tr>
+              <tr><td><code>MOUSETYPEWINPOS</code></td><td>3</td><td>Windows system cursor with position tracking</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="compile-flags.html">← <span class="pnl-label">Compile Flags</span></a>
+          <a class="page-nav-link next" href="../modules/index.html"><span class="pnl-label">Modules Index</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('game-constants');</script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio System — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Audio System</span>
+        </nav>
+
+        <h1>Audio System</h1>
+        <p>
+          Free Eggbert supports two audio backends, selected at compile time via the
+          <code>_BASS</code> flag in <code>include/def.hpp</code>.
+        </p>
+
+        <h2 id="backends">Audio Backends</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Backend</th><th>Flag</th><th>Source File</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>DirectSound / MCI</td>
+                <td><code>_BASS=FALSE</code> (default)</td>
+                <td><code>src/sound.cpp</code></td>
+                <td><span class="badge badge-partial">Default / Active</span></td>
+              </tr>
+              <tr>
+                <td>BASS + BASSMIDI library</td>
+                <td><code>_BASS=TRUE</code></td>
+                <td><code>src/soundbass.cpp</code></td>
+                <td><span class="badge badge-partial">Alternative</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout verify">
+          <span class="callout-icon">🔍</span>
+          <div class="callout-body">
+            <div class="callout-title">Needs Verification</div>
+            The README mentions BASS/BASSMIDI, but the current default is
+            <code>_BASS=FALSE</code> (DirectSound/MCI path active).
+            The documentation may be outdated; verify the current build configuration.
+          </div>
+        </div>
+
+        <h2 id="csound">CSound Class</h2>
+        <p>
+          <strong>Header:</strong> <code>include/sound.hpp</code><br>
+          <strong>Implementation:</strong> <code>src/sound.cpp</code> (DirectSound) or
+          <code>src/soundbass.cpp</code> (BASS)
+        </p>
+        <p>
+          The <code>CSound</code> class is responsible for loading and playing all audio.
+          It is instantiated in <code>src/blupi.cpp</code> during application startup.
+        </p>
+        <p>Key features:</p>
+        <ul>
+          <li>Loads <code>.blp</code> sound files from <code>gamefiles/SOUND/</code></li>
+          <li>Supports 3D positional audio — sounds play louder when the player is nearby</li>
+          <li>Music tracks loop and change when transitioning between regions</li>
+          <li>Vehicle sounds loop and vary in pitch based on vehicle state</li>
+        </ul>
+
+        <h2 id="directsound-backend">DirectSound Backend (Default)</h2>
+        <p>
+          <strong>File:</strong> <code>src/sound.cpp</code><br>
+          <strong>Active when:</strong> <code>_BASS=FALSE</code> (default)
+        </p>
+        <p>
+          Uses the Win32 DirectSound API (via Free Direct / SDL3 abstraction on non-Windows platforms).
+          Wraps DirectSound buffer management for loading and playback of WAV-format sound data.
+        </p>
+        <p>WAV file loading is handled separately by <code>src/wave.cpp</code> (<code>include/wave.hpp</code>).</p>
+
+        <h2 id="bass-backend">BASS Library Backend</h2>
+        <p>
+          <strong>File:</strong> <code>src/soundbass.cpp</code><br>
+          <strong>Active when:</strong> <code>_BASS=TRUE</code>
+        </p>
+        <p>
+          Uses the <a href="https://www.un4seen.com/">BASS</a> audio library and BASSMIDI
+          for MIDI music support. Library binaries are located in the <code>bass/</code> subdirectory.
+        </p>
+        <p>To switch to the BASS backend, change in <code>include/def.hpp</code>:</p>
+        <pre><code><span class="cmt">// Default (DirectSound/MCI):</span>
+<span class="kw">#define</span> _BASS FALSE
+
+<span class="cmt">// To enable BASS library:</span>
+<span class="kw">#define</span> _BASS TRUE</code></pre>
+
+        <h2 id="music">Music</h2>
+        <p>
+          10 background music tracks: <code>MUSIC000.BLP</code> through <code>MUSIC009.BLP</code>
+          in <code>gamefiles/SOUND/</code> (uppercase extension on disk).
+        </p>
+        <ul>
+          <li>Music track selection is stored per-level in <code>DescFile::music</code></li>
+          <li>Music stops and changes when transitioning between regions</li>
+          <li>Current music is tracked in <code>DescSave::music</code></li>
+        </ul>
+
+        <h2 id="sound-effects">Sound Effects</h2>
+        <p>
+          93 sound effect files in <code>gamefiles/SOUND/</code> (indices 0–92):
+          <code>SOUND000.BLP</code>–<code>SOUND065.BLP</code> (uppercase) and
+          <code>sound066.blp</code>–<code>sound092.blp</code> (lowercase).
+          Plus a special <code>SOUND_MOVIE=99</code> marker (not a real sample file).
+        </p>
+        <p>
+          Sound effects are organized by category. See the full
+          <a href="reference/sound-effects.html">Sound Effects Reference</a> for all constants.
+        </p>
+
+        <h3 id="sound-categories">Sound Categories</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Category</th><th>Examples</th></tr></thead>
+            <tbody>
+              <tr><td>UI/Menu</td><td><code>SOUND_CLICK</code> (0), <code>SOUND_ERROR</code> (27)</td></tr>
+              <tr><td>Movement / Jumping</td><td><code>SOUND_JUMP0–2</code>, <code>SOUND_JUMPEND</code>, <code>SOUND_FALL</code></td></tr>
+              <tr><td>Footsteps (surface variants)</td><td>Wood, metal, cave, slime, plastic, cheese, grass</td></tr>
+              <tr><td>Helicopter</td><td><code>SOUND_HELICOSTART/HIGH/STOP/LOW</code></td></tr>
+              <tr><td>Jeep</td><td><code>SOUND_JEEPSTART/HIGH/STOP/LOW</code></td></tr>
+              <tr><td>Water</td><td><code>SOUND_PLOUF</code>, <code>SOUND_BLUP</code>, <code>SOUND_DROWN</code></td></tr>
+              <tr><td>Combat / Bombs</td><td><code>SOUND_BOUM</code>, <code>SOUND_GLU</code>, <code>SOUND_ELECTRO</code></td></tr>
+              <tr><td>Power-ups</td><td><code>SOUND_STARTSHIELD/STOPSHIELD</code>, <code>SOUND_STARTPOWER/STOPPOWER</code></td></tr>
+              <tr><td>Collectibles / Goals</td><td><code>SOUND_TRESOR</code>, <code>SOUND_EGG</code>, <code>SOUND_ENDOK</code></td></tr>
+              <tr><td>Level mechanics</td><td><code>SOUND_DOOR</code>, <code>SOUND_TELEPORTE</code>, <code>SOUND_BRIDGE1/2</code></td></tr>
+              <tr><td>Character reactions</td><td><code>SOUND_VERTIGO</code>, <code>SOUND_BYE</code>, <code>SOUND_MOCKERY</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="surface-sounds">Surface-Specific Footsteps</h2>
+        <p>
+          The game uses different landing/footstep sounds depending on the surface type Blupi is
+          standing on. Each surface type has two sounds:
+          a landing sound (<code>JUMPEND*</code>) and a step sound (<code>JUMPTOC*</code>).
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Surface</th><th>JUMPEND constant</th><th>JUMPTOC constant</th></tr></thead>
+            <tbody>
+              <tr><td>Default (stone)</td><td><code>SOUND_JUMPEND</code> (3)</td><td><code>SOUND_JUMPTOC</code> (4)</td></tr>
+              <tr><td>Wood</td><td><code>SOUND_JUMPENDb</code> (78)</td><td><code>SOUND_JUMPTOCb</code> (79)</td></tr>
+              <tr><td>Metal</td><td><code>SOUND_JUMPENDm</code> (80)</td><td><code>SOUND_JUMPTOCm</code> (81)</td></tr>
+              <tr><td>Cave</td><td><code>SOUND_JUMPENDg</code> (82)</td><td><code>SOUND_JUMPTOCg</code> (83)</td></tr>
+              <tr><td>Slime</td><td><code>SOUND_JUMPENDo</code> (84)</td><td><code>SOUND_JUMPTOCo</code> (85)</td></tr>
+              <tr><td>Plastic</td><td><code>SOUND_JUMPENDk</code> (86)</td><td><code>SOUND_JUMPTOCk</code> (87)</td></tr>
+              <tr><td>Cheese</td><td><code>SOUND_JUMPENDf</code> (88)</td><td><code>SOUND_JUMPTOCf</code> (89)</td></tr>
+              <tr><td>Grass</td><td><code>SOUND_JUMPENDh</code> (90)</td><td><code>SOUND_JUMPTOCh</code> (91)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="future-audio">Future Audio Work</h2>
+        <div class="callout todo">
+          <span class="callout-icon">✅</span>
+          <div class="callout-body">
+            <div class="callout-title">TODO</div>
+            A potential future improvement from TODO.md: add a CMake option to select
+            the audio backend explicitly:
+            <code>FREE_EGGBERT_AUDIO_BACKEND=DSOUND|BASS|STUB</code>
+          </div>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="rendering.html">← <span class="pnl-label">Rendering</span></a>
+          <a class="page-nav-link next" href="input.html"><span class="pnl-label">Input System</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('audio');</script>
+</body>
+</html>

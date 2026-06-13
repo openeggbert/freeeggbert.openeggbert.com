@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Running the Game — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Running the Game</span>
+        </nav>
+
+        <h1>Running the Game</h1>
+
+        <h2 id="requirements">Runtime Requirements</h2>
+        <ul>
+          <li><strong>Game asset files</strong> — <code>gamefiles/DATA</code>, <code>gamefiles/IMAGE08</code>,
+              <code>gamefiles/IMAGE16</code>, <code>gamefiles/SOUND</code> must be present</li>
+          <li><strong>Working directory</strong> — the executable must be run from the project root
+              so that relative paths to <code>gamefiles/</code> resolve correctly</li>
+          <li>On Windows with native DirectX: DirectX runtime libraries</li>
+          <li>On all platforms via FreeDirect: SDL3, SDL3_image, SDL3_mixer (bundled by default)</li>
+        </ul>
+
+        <h2 id="desktop">Desktop (Linux / macOS / Windows)</h2>
+        <pre><code><span class="cmt"># Run from the project root directory</span>
+./build/bin/SPEEDY_BLUPI_WINDOWS        <span class="cmt"># Linux/macOS</span>
+build\bin\SPEEDY_BLUPI_WINDOWS.exe      <span class="cmt"># Windows</span></code></pre>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Working Directory</div>
+            The game opens assets using paths like <code>gamefiles/DATA/config.def</code>.
+            If you run the executable from inside <code>build/bin/</code>, these paths will fail.
+            Always run from the project root.
+          </div>
+        </div>
+
+        <h2 id="web">Web (Emscripten)</h2>
+        <pre><code><span class="cmt"># Start a local HTTP server and open the game in a browser</span>
+emrun cmake-build-web/bin/SPEEDY_BLUPI_WINDOWS.html</code></pre>
+        <p>
+          The web build preloads all game assets into the virtual filesystem at compile time.
+          Save data is automatically stored in the browser's IndexedDB.
+        </p>
+
+        <h2 id="android">Android</h2>
+        <pre><code><span class="cmt"># Install and launch via ADB</span>
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+adb shell am start -n org.openeggbert.freeeggbert/.FreeEggbertActivity</code></pre>
+
+        <h2 id="configuration-file">Configuration File</h2>
+        <p>
+          The game reads and writes a configuration file at
+          <code>gamefiles/DATA/config.def</code>. This is a plain-text file.
+          If it is missing or malformed, the game may fail to start.
+        </p>
+        <p>Keys parsed by <code>ReadConfig()</code> in <code>src/blupi.cpp</code>. See <a href="configuration.html">Configuration</a> for full details.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Key</th><th>Values</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>FullScreen</code></td><td>0 / 1</td><td>Windowed (0) or fullscreen (1)</td></tr>
+              <tr><td><code>TrueColorBack</code></td><td>8 / 16</td><td>Color depth for background images</td></tr>
+              <tr><td><code>TrueColorDecor</code></td><td>8 / 16</td><td>Color depth for decor images</td></tr>
+              <tr><td><code>MouseType</code></td><td>1–9</td><td>Mouse cursor type (1=graphic, 2=Win, 3=Win+pos)</td></tr>
+              <tr><td><code>SpeedRate</code></td><td>1–2</td><td>Game speed multiplier</td></tr>
+              <tr><td><code>Timer</code></td><td>10–1000</td><td>Timer tick interval (ms, default ~50)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="display-mode">Display Mode</h2>
+        <p>
+          The game runs at a fixed resolution of <strong>640×480 pixels</strong>.
+          On the FreeDirect/SDL3 backend, the window can be resized, and the game image
+          will be letterboxed to preserve the original aspect ratio.
+        </p>
+        <p>
+          On Android and widescreen displays, Free Direct uses
+          <code>SDL_LOGICAL_PRESENTATION_LETTERBOX</code>, which automatically adds black bars
+          on the sides or top/bottom. The game image is never stretched.
+        </p>
+
+        <h2 id="audio">Audio at Runtime</h2>
+        <p>
+          The game loads sound effects and music from <code>gamefiles/SOUND/</code>.
+          If this directory is missing or empty, the game will run without audio
+          (or may crash — <span class="badge badge-verify">needs verification</span>).
+        </p>
+        <p>
+          The default audio backend is the DirectSound/MCI path (<code>_BASS=FALSE</code>).
+          The BASS library alternative can be enabled at compile time.
+          See <a href="audio.html">Audio System</a> for details.
+        </p>
+
+        <h2 id="common-issues">Common Runtime Issues</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Problem</th><th>Likely Cause</th><th>Solution</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Game exits immediately</td>
+                <td>Missing <code>gamefiles/DATA/config.def</code> or asset directories</td>
+                <td>Ensure all asset directories are present under <code>gamefiles/</code></td>
+              </tr>
+              <tr>
+                <td>Black screen / no rendering</td>
+                <td>CPixmap::Create() initialization failure</td>
+                <td>Known decompilation artifact; check build logs. See <a href="development/known-issues.html">Known Issues</a></td>
+              </tr>
+              <tr>
+                <td>No audio</td>
+                <td>Missing SOUND directory or audio backend issue</td>
+                <td>Verify <code>gamefiles/SOUND/</code> exists with .blp files</td>
+              </tr>
+              <tr>
+                <td>Network features unavailable</td>
+                <td>DirectPlay initialization fails silently</td>
+                <td>Expected; game falls back to single-player. See <a href="systems/network.html">Network System</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="build.html">← <span class="pnl-label">Build &amp; Compile</span></a>
+          <a class="page-nav-link next" href="platform-support.html"><span class="pnl-label">Platform Support</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('running');</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Input System — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Input System</span>
+        </nav>
+
+        <h1>Input System</h1>
+
+        <h2 id="cevent-overview">CEvent Overview</h2>
+        <p>
+          <strong>Header:</strong> <code>include/event.hpp</code> (~320 lines)<br>
+          <strong>Source:</strong> <code>src/event.cpp</code> (~5,878 lines — the largest file in the project)
+        </p>
+        <p>
+          <code>CEvent</code> is responsible for:
+        </p>
+        <ul>
+          <li>Processing all keyboard and mouse input</li>
+          <li>Dispatching game phase changes (via <code>WM_PHASE_*</code> messages)</li>
+          <li>Managing UI interactions (menus, buttons, dialogs)</li>
+          <li>Coordinating the game loop with the rendering and game logic systems</li>
+        </ul>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Work in Progress</div>
+            <code>event.cpp</code> is the most complex and most incomplete file in the project.
+            Phase dispatch and many input behaviors need further work.
+          </div>
+        </div>
+
+        <h2 id="key-input">Key Input Bitmask</h2>
+        <p>
+          Game input is condensed into a bitmask of pressed keys, defined in
+          <code>include/def.hpp</code>. These flags can be combined:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Bitmask Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>KEY_NONE</code></td><td>0x00</td><td>No key pressed</td></tr>
+              <tr><td><code>KEY_LEFT</code></td><td>0x01</td><td>Move left / steer left</td></tr>
+              <tr><td><code>KEY_RIGHT</code></td><td>0x02</td><td>Move right / steer right</td></tr>
+              <tr><td><code>KEY_UP</code></td><td>0x04</td><td>Look up / fly up (helicopter)</td></tr>
+              <tr><td><code>KEY_DOWN</code></td><td>0x08</td><td>Look down / descend</td></tr>
+              <tr><td><code>KEY_JUMP</code></td><td>0x10</td><td>Jump</td></tr>
+              <tr><td><code>KEY_FIRE</code></td><td>0x20</td><td>Fire / action / place bomb</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Example: holding Left + Jump = <code>KEY_LEFT | KEY_JUMP</code> = <code>0x11</code> = 17.</p>
+
+        <h2 id="input-flow">Input Flow</h2>
+        <ol>
+          <li>Win32 window procedure receives <code>WM_KEYDOWN</code> / <code>WM_KEYUP</code> messages</li>
+          <li><code>CEvent</code> translates these to <code>KEY_*</code> bitmask values</li>
+          <li>The key bitmask is passed to <code>CDecor::SetInput(int keys)</code> each game tick</li>
+          <li><code>src/decblupi.cpp</code> reads the input and updates player state and physics</li>
+          <li>In multiplayer, the current key state is included in each <code>NetPacket</code> sent to other players</li>
+        </ol>
+
+        <h2 id="phase-dispatch">Game Phase Dispatch</h2>
+        <p>
+          <code>CEvent</code> handles phase transitions via Windows messages (<code>WM_USER + N</code>).
+          Each game phase corresponds to a screen or mode — gameplay, menus, level editor,
+          win/lose screens, multiplayer lobby, etc.
+        </p>
+        <p>See <a href="reference/game-phases.html">Game Phases Reference</a> for all 60+ phases.</p>
+
+        <h2 id="mouse-input">Mouse Input</h2>
+        <p>
+          The game uses a mouse cursor (sprites from <code>mouse.blp</code>).
+          Mouse input is handled in <code>CEvent</code> and used primarily for:
+        </p>
+        <ul>
+          <li>Clicking UI buttons in menus and dialogs</li>
+          <li>Level editor interactions (placing/removing tiles)</li>
+          <li>Multiplayer session browser</li>
+        </ul>
+
+        <h2 id="platform-input">Platform-Specific Input</h2>
+        <h3 id="web-input">Web (Emscripten)</h3>
+        <p>
+          Keyboard events are handled via browser event listeners and translated to the
+          Win32 key message format by Free API. Mouse events are similarly translated.
+        </p>
+
+        <h3 id="android-input">Android</h3>
+        <p>
+          Touch coordinates are automatically mapped from physical screen coordinates
+          to game logical coordinates by SDL3's logical presentation layer.
+          Touches on letterbox bars do not register as in-game input.
+        </p>
+        <p>Diagnostic log (first 20 input events):</p>
+        <pre><code>FREE_DIRECT_INPUT: raw=x,y mapped=x,y evtType=… inside=true/false</code></pre>
+
+        <h2 id="input-verification">Input Verification</h2>
+        <div class="callout verify">
+          <span class="callout-icon">🔍</span>
+          <div class="callout-body">
+            <div class="callout-title">Needs Verification</div>
+            The exact key-to-action mapping is derived from code analysis.
+            The original game likely supported custom key configuration.
+            The current mapping may not match the original defaults perfectly.
+          </div>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="audio.html">← <span class="pnl-label">Audio System</span></a>
+          <a class="page-nav-link next" href="configuration.html"><span class="pnl-label">Configuration</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('input');</script>
+</body>
+</html>

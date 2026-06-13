@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Channels — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Reference</a>
+          <span class="sep">/</span>
+          <span class="current">Image Channels</span>
+        </nav>
+
+        <h1>Image Channels</h1>
+        <p>
+          The <a href="../modules/cpixmap.html"><code>CPixmap</code></a> class manages
+          15 DirectDraw surfaces simultaneously, each identified by a channel index constant
+          defined in <code>include/def.hpp</code>. Channels allow different layers to be
+          rendered independently and composited to form the final frame.
+        </p>
+
+        <h2 id="channel-table">Channel Reference</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Enum</th><th>Value</th><th>Used For</th><th>Image File</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>CHBACK</code></td>
+                <td>0</td>
+                <td>Background / level terrain tiles</td>
+                <td><code>decor000.blp</code>–<code>decor031.blp</code> (one per region)</td>
+              </tr>
+              <tr>
+                <td><code>CHOBJECT</code></td>
+                <td>1</td>
+                <td>Foreground objects, pickups, enemies, and interactive items</td>
+                <td><code>object.blp</code></td>
+              </tr>
+              <tr>
+                <td><code>CHBLUPI</code></td>
+                <td>2</td>
+                <td>Default player character sprites</td>
+                <td><code>blupi000.blp</code></td>
+              </tr>
+              <tr>
+                <td><code>CHDECOR</code></td>
+                <td>3</td>
+                <td>Decorative overlay layer</td>
+                <td><code>decor000.blp</code>–<code>decor031.blp</code> (same as CHBACK)</td>
+              </tr>
+              <tr>
+                <td><code>CHBUTTON</code></td>
+                <td>4</td>
+                <td>UI button sprites</td>
+                <td><code>button.blp</code></td>
+              </tr>
+              <tr>
+                <td><code>CHJAUGE</code></td>
+                <td>5</td>
+                <td>Health/gauge progress bar sprites</td>
+                <td><code>jauge.blp</code> (IMAGE08 only — no 16-bit version)</td>
+              </tr>
+              <tr>
+                <td><code>CHTEXT</code></td>
+                <td>6</td>
+                <td>Normal-size text character sprites</td>
+                <td><code>text.blp</code></td>
+              </tr>
+              <tr>
+                <td><code>CHLITTLE</code></td>
+                <td>7</td>
+                <td>Small text character sprites</td>
+                <td><code>littletxt.blp</code></td>
+              </tr>
+              <tr>
+                <td><code>CHMAP</code></td>
+                <td>8</td>
+                <td>Minimap sprites</td>
+                <td><code>map.blp</code> (IMAGE08 only — no 16-bit version)</td>
+              </tr>
+              <tr>
+                <td><code>CHEXPLO</code></td>
+                <td>9</td>
+                <td>Explosion sprites (128×128 px each)</td>
+                <td><code>explo.blp</code></td>
+              </tr>
+              <tr>
+                <td><code>CHELEMENT</code></td>
+                <td>10</td>
+                <td>Particle and element effect sprites</td>
+                <td><code>element.blp</code></td>
+              </tr>
+              <tr>
+                <td><code>CHBLUPI1</code></td>
+                <td>11</td>
+                <td>Multiplayer player 1 character variant</td>
+                <td><code>blupi001.blp</code></td>
+              </tr>
+              <tr>
+                <td><code>CHBLUPI2</code></td>
+                <td>12</td>
+                <td>Multiplayer player 2 character variant</td>
+                <td><code>blupi002.blp</code></td>
+              </tr>
+              <tr>
+                <td><code>CHBLUPI3</code></td>
+                <td>13</td>
+                <td>Multiplayer player 3 character variant</td>
+                <td><code>blupi003.blp</code></td>
+              </tr>
+              <tr>
+                <td><code>CHTEMP</code> (<code>CHMAX</code>)</td>
+                <td>14</td>
+                <td>Temporary / scratch surface for intermediate rendering</td>
+                <td>— (runtime only)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="color-modes">8-bit vs. 16-bit</h2>
+        <p>
+          Each channel can load from either <code>IMAGE08/</code> (8-bit palette) or
+          <code>IMAGE16/</code> (16-bit true-color) based on the
+          <code>TrueColorBack</code> and <code>TrueColorDecor</code> settings in <code>config.def</code>.
+        </p>
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            <strong>Exception:</strong> <code>CHJAUGE</code> (<code>jauge.blp</code>) and
+            <code>CHMAP</code> (<code>map.blp</code>) are always loaded from <code>IMAGE08/</code>.
+            There is no 16-bit version of these files.
+          </div>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="game-phases.html">← <span class="pnl-label">Game Phases</span></a>
+          <a class="page-nav-link next" href="data-structures.html"><span class="pnl-label">Data Structures</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('image-channels');</script>
+</body>
+</html>

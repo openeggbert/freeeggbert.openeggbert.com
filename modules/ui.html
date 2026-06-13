@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI Components — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Modules</a>
+          <span class="sep">/</span>
+          <span class="current">UI Components</span>
+        </nav>
+
+        <h1>UI Components</h1>
+        <p>
+          Three UI helper classes provide button rendering, gauge bars, and menu navigation.
+          All are considered <em>tentatively complete</em> (needs testing) in the current codebase.
+        </p>
+
+        <h2 id="cbutton">CButton</h2>
+        <p>
+          <strong>Header:</strong> <code>include/button.hpp</code><br>
+          <strong>Implementation:</strong> <code>src/button.cpp</code><br>
+          <strong>Status:</strong> <span class="badge badge-done">Done</span>
+        </p>
+        <p>
+          <code>CButton</code> handles rendering and hit-testing for UI buttons.
+          Up to <code>MAXBUTTON</code> (40) buttons can be active on screen simultaneously.
+          Button sprites are drawn from channel <code>CHBUTTON</code> using
+          <code>button.blp</code> (40×40 px per button sprite).
+        </p>
+        <h3>Key aspects</h3>
+        <ul>
+          <li>Each button has a position, sprite icon index, and enabled/pressed state</li>
+          <li>Hit-test checks whether a mouse click falls within a button's 40×40 bounding rect</li>
+          <li>Pressed/hover states use different icon indices from the sprite sheet</li>
+          <li>Used by <code>CEvent</code> to drive menu and in-game UI interactions</li>
+        </ul>
+        <pre><code><span class="cmt">// Sprite dimensions</span>
+<span class="kw">#define</span> DIMBUTTONX  40
+<span class="kw">#define</span> DIMBUTTONY  40
+<span class="kw">#define</span> MAXBUTTON   40</code></pre>
+
+        <h2 id="cjauge">CJauge</h2>
+        <p>
+          <strong>Header:</strong> <code>include/jauge.hpp</code><br>
+          <strong>Implementation:</strong> <code>src/jauge.cpp</code><br>
+          <strong>Status:</strong> <span class="badge badge-done">Done</span>
+        </p>
+        <p>
+          <code>CJauge</code> renders gauge/progress bars used for lives, health, or other
+          metered values. Up to 2 gauge slots (<code>jaugeHide[2]</code>,
+          <code>jaugeLevel[2]</code>) are tracked in the game state.
+        </p>
+        <h3>Key aspects</h3>
+        <ul>
+          <li>Gauge sprites drawn from channel <code>CHJAUGE</code> using <code>jauge.blp</code></li>
+          <li>Always loaded from <code>IMAGE08/</code> regardless of color depth setting (no IMAGE16 counterpart)</li>
+          <li>Gauge dimensions: 124×22 px (<code>DIMJAUGEX</code> × <code>DIMJAUGEY</code>)</li>
+          <li>Visibility and type per slot tracked in <code>DescSave::jaugeHide[]</code> and <code>jaugeType[]</code></li>
+        </ul>
+        <pre><code><span class="cmt">// Sprite dimensions</span>
+<span class="kw">#define</span> DIMJAUGEX  124
+<span class="kw">#define</span> DIMJAUGEY   22</code></pre>
+
+        <h2 id="cmenu">CMenu</h2>
+        <p>
+          <strong>Header:</strong> <code>include/menu.hpp</code><br>
+          <strong>Implementation:</strong> <code>src/menu.cpp</code><br>
+          <strong>Status:</strong> <span class="badge badge-done">Done</span>
+        </p>
+        <p>
+          <code>CMenu</code> renders menus and handles keyboard/mouse navigation within them.
+          Background screens are drawn from <code>screen*.blp</code> files in
+          <code>IMAGE08/</code> or <code>IMAGE16/</code>.
+        </p>
+        <h3>Key aspects</h3>
+        <ul>
+          <li>Draws full-screen background images for menu screens</li>
+          <li>Delegates button hit-testing to <code>CButton</code></li>
+          <li>Transitions between menu states via <code>WM_PHASE_*</code> messages dispatched through <code>CEvent</code></li>
+        </ul>
+
+        <h2 id="text-rendering">Text Rendering</h2>
+        <p>
+          Free Eggbert uses bitmap font rendering rather than system fonts.
+          Two font sizes are available, each with its own channel:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Font</th><th>Channel</th><th>Sprite file</th><th>Cell size</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Normal text</td>
+                <td><code>CHTEXT</code></td>
+                <td><code>text.blp</code></td>
+                <td>16×16 px (<code>DIMTEXTX</code> × <code>DIMTEXTY</code>)</td>
+              </tr>
+              <tr>
+                <td>Small text</td>
+                <td><code>CHLITTLE</code></td>
+                <td><code>littletxt.blp</code></td>
+                <td>16×12 px (<code>DIMLITTLEX</code> × <code>DIMLITTLEY</code>)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Text drawing is handled by <code>CPixmap</code> using the appropriate channel.
+        </p>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="cnetwork.html">← <span class="pnl-label">CNetwork</span></a>
+          <a class="page-nav-link next" href="../systems/network.html"><span class="pnl-label">Network System</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('ui-components');</script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CDecor — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Modules</a>
+          <span class="sep">/</span>
+          <span class="current">CDecor</span>
+        </nav>
+
+        <h1>CDecor</h1>
+        <p>
+          <strong>Header:</strong> <code>include/decor.hpp</code> (~642 lines)<br>
+          <strong>Implementation:</strong> Split across 8 source files
+        </p>
+        <p>
+          <code>CDecor</code> is the <strong>central game engine class</strong> in Free Eggbert.
+          It manages the entire game world — the 100×100 tile grid, all moving objects,
+          the player character, game logic, rendering, save/load, networking, and the level editor.
+          Everything that "is the game" lives here.
+        </p>
+
+        <h2 id="source-files">Source File Responsibilities</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Responsibility</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>src/decor.cpp</code></td>
+                <td>Initialization, world rendering, main step loop, region/music management</td>
+                <td><span class="badge badge-wip">WIP</span></td>
+              </tr>
+              <tr>
+                <td><code>src/decblupi.cpp</code></td>
+                <td>Player movement, jumping, all vehicle logic, physics (4,395 lines)</td>
+                <td><span class="badge badge-wip">WIP</span></td>
+              </tr>
+              <tr>
+                <td><code>src/decblock.cpp</code></td>
+                <td>Block/crate interaction, push/pull, door logic</td>
+                <td><span class="badge badge-wip">WIP</span></td>
+              </tr>
+              <tr>
+                <td><code>src/decmove.cpp</code></td>
+                <td>Moving object (enemy/bomb/effect) step logic and AI</td>
+                <td><span class="badge badge-wip">WIP</span></td>
+              </tr>
+              <tr>
+                <td><code>src/decnet.cpp</code></td>
+                <td>Network game synchronization and event dispatch</td>
+                <td><span class="badge badge-wip">WIP</span></td>
+              </tr>
+              <tr>
+                <td><code>src/decdesign.cpp</code></td>
+                <td>Level editor — place/remove tiles and objects</td>
+                <td><span class="badge badge-wip">WIP</span></td>
+              </tr>
+              <tr>
+                <td><code>src/decio.cpp</code></td>
+                <td>Save/load game state to/from .blp files</td>
+                <td><span class="badge badge-wip">WIP</span></td>
+              </tr>
+              <tr>
+                <td><code>src/dectables.cpp</code></td>
+                <td>Static lookup tables for decor</td>
+                <td><span class="badge badge-done">Done</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="key-methods">Key Public Methods</h2>
+        <p>Selected methods from <code>include/decor.hpp</code> (80+ methods total):</p>
+        <pre><code><span class="cmt">// Lifecycle</span>
+<span class="kw">void</span> Create(HWND hWnd, CSound*, CPixmap*, CNetwork*);
+BOOL LoadImages();
+<span class="kw">void</span> InitGamer();
+<span class="kw">void</span> InitDecor();
+<span class="kw">void</span> PlayPrepare(BOOL bTest);
+<span class="kw">void</span> BuildPrepare();
+
+<span class="cmt">// Game loop</span>
+<span class="kw2">int</span>  IsTerminated();
+<span class="kw">void</span> MoveStep();            <span class="cmt">// advance world simulation by one tick</span>
+<span class="kw">void</span> Build(RECT rect);      <span class="cmt">// render the visible world area</span>
+<span class="kw">void</span> SetInput(<span class="kw2">int</span> keys);    <span class="cmt">// feed key input (KEY_* bitmask)</span>
+<span class="kw2">int</span>  GetTime();
+<span class="kw">void</span> SetTime(<span class="kw2">int</span> time);
+
+<span class="cmt">// World settings</span>
+<span class="kw2">int</span>  GetRegion();
+<span class="kw">void</span> SetRegion(<span class="kw2">int</span> region);
+<span class="kw2">int</span>  GetMusic();
+<span class="kw">void</span> SetMusic(<span class="kw2">int</span> music);
+POINT GetDim();
+<span class="kw">void</span> SetDim(POINT dim);
+BOOL GetPause();
+<span class="kw">void</span> SetPause(BOOL bPause);
+
+<span class="cmt">// Player state</span>
+<span class="kw2">int</span>  GetNbVies();
+<span class="kw">void</span> SetNbVies(<span class="kw2">int</span> nbVies);
+<span class="kw">void</span> GetBlupiInfo(BOOL *pbHelico, BOOL *pbJeep, BOOL *pbSkate, BOOL *pbNage);
+<span class="kw2">int</span>  GetBlupiChannelStandard();
+<span class="kw2">int</span>  GetBlupiChannelActual();
+<span class="kw2">int</span>  GetIconPerso();
+
+<span class="cmt">// Cheats</span>
+BOOL GetSuperBlupi();
+<span class="kw">void</span> SetSuperBlupi(BOOL bSuperBlupi);
+BOOL GetDrawSecret();
+<span class="kw">void</span> SetDrawSecret(BOOL bDrawSecret);
+<span class="kw">void</span> CheatAction(<span class="kw2">int</span> cheat);
+
+<span class="cmt">// Save / load</span>
+BOOL Write(<span class="kw2">int</span> gamer, <span class="kw2">int</span> mission, BOOL bUser);
+BOOL Read(<span class="kw2">int</span> gamer, <span class="kw2">int</span> mission, BOOL bUser);
+BOOL CurrentWrite(<span class="kw2">int</span> gamer, <span class="kw2">int</span> mission, BOOL bUser=FALSE);
+BOOL CurrentRead(<span class="kw2">int</span> gamer, <span class="kw2">int</span> mission, BOOL *pbMission, BOOL *pbPrivate);
+BOOL MissionStart(<span class="kw2">int</span> gamer, <span class="kw2">int</span> mission, <span class="kw2">char</span>* param3);
+BOOL DeleteMission(<span class="kw2">int</span> user, <span class="kw2">int</span> mission, BOOL bUser);
+
+<span class="cmt">// Doors and world</span>
+<span class="kw">void</span> SetAllMissions(BOOL bAllMissions);
+<span class="kw">void</span> OpenDoorsTresor();
+<span class="kw">void</span> OpenDoorsWin();
+<span class="kw">void</span> OpenDoor(POINT cel);
+
+<span class="cmt">// Network debug flags</span>
+BOOL GetNetPacked();   <span class="kw">void</span> SetNetPacked(BOOL);
+BOOL GetNetMovePredict(); <span class="kw">void</span> SetNetMovePredict(BOOL);
+BOOL GetNetDebug();    <span class="kw">void</span> SetNetDebug(BOOL);
+<span class="kw">void</span> SetMulti(BOOL bMulti);
+<span class="kw">void</span> SetTeam(<span class="kw2">int</span> team);
+
+<span class="cmt">// Audio (delegates to CSound)</span>
+<span class="kw">void</span> PlaySound(<span class="kw2">int</span> sound, POINT pos, BOOL bLocal);
+<span class="kw">void</span> StopSound(<span class="kw2">int</span> sound);
+
+<span class="cmt">// Moving objects</span>
+BOOL ObjectStart(POINT pos, <span class="kw2">int</span> type, <span class="kw2">int</span> speed, BOOL bMulti);
+BOOL ObjectDelete(POINT pos, <span class="kw2">int</span> type, BOOL bMulti=TRUE);
+<span class="kw">void</span> MoveObjectStep();
+
+<span class="cmt">// World tile helpers</span>
+BOOL IsLave(POINT pos);      <span class="cmt">// lava</span>
+BOOL IsPiege(POINT pos);     <span class="cmt">// trap</span>
+BOOL IsGoutte(POINT pos, BOOL bAlways); <span class="cmt">// drip</span>
+BOOL IsScie(POINT pos);      <span class="cmt">// saw</span>
+BOOL IsSwitch(POINT pos, POINT *outCelSwitch);
+BOOL IsBlitz(POINT pos, BOOL bAlways);   <span class="cmt">// lightning</span>
+BOOL IsDeepWater(POINT pos);
+BOOL IsSurfWater(POINT pos);</code></pre>
+
+        <h2 id="player-model">Player State Model</h2>
+        <p>
+          Unlike the Planet Blupi engine which uses a <code>Blupi[100]</code> array for up to 100
+          simultaneous characters, Free Eggbert stores the player state as individual member
+          fields directly in <code>CDecor</code>:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field Pattern</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>m_blupiPos</code></td><td>Current position in world</td></tr>
+              <tr><td><code>m_blupiAction</code></td><td>Current animation/action state (<code>ACTION_*</code>)</td></tr>
+              <tr><td><code>m_blupiDir</code></td><td>Facing direction</td></tr>
+              <tr><td><code>m_blupiTransport</code></td><td>Current vehicle (0=none, 1=helicopter, 2=jeep, 3=tank)</td></tr>
+              <tr><td><code>m_blupiShield</code>, <code>m_blupiPower</code>, etc.</td><td>Active power-up states</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          In multiplayer, up to 4 players are tracked through the <code>NetPacket</code> stream;
+          each player sends their own position and state each game tick.
+        </p>
+
+        <h2 id="moveobject">Moving Object System</h2>
+        <p>
+          The <code>moveObject[200]</code> array (type <code>MoveObject[MAXMOVEOBJECT]</code>)
+          tracks all active enemies, bombs, vehicles, collectibles, and effects in the level.
+          This array is managed primarily in <code>src/decmove.cpp</code>.
+        </p>
+        <p>See <a href="../reference/object-types.html">Object Types Reference</a> for all <code>TYPE_*</code> values.</p>
+
+        <h2 id="save-load">Save/Load</h2>
+        <p>
+          <code>src/decio.cpp</code> serializes the complete game state — including the world grid,
+          all moving objects, and player status — into a <code>DescSave</code> struct (~56KB).
+          Up to 6 save slots are supported.
+        </p>
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            Save/load may have version compatibility gaps — files written by one build may
+            not load correctly in another if the <code>DescSave</code> layout has changed.
+          </div>
+        </div>
+
+        <h2 id="level-editor">Level Editor</h2>
+        <p>
+          <code>src/decdesign.cpp</code> implements the built-in level editor.
+          Activated via <code>WM_PHASE_BUILD</code>.
+        </p>
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            The level editor has known missing features and is considered one of the
+            files requiring the most work.
+          </div>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="index.html">← <span class="pnl-label">Modules Index</span></a>
+          <a class="page-nav-link next" href="cpixmap.html"><span class="pnl-label">CPixmap</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('cdecor');</script>
+</body>
+</html>

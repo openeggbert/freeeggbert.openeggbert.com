@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CEvent — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Modules</a>
+          <span class="sep">/</span>
+          <span class="current">CEvent</span>
+        </nav>
+
+        <h1>CEvent</h1>
+        <p>
+          <strong>Header:</strong> <code>include/event.hpp</code><br>
+          <strong>Implementation:</strong> <code>src/event.cpp</code>
+        </p>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <code>event.cpp</code> is identified as the <strong>most complex and incomplete</strong>
+            source file in the project. It requires the most work of all files and is the top
+            debugging priority.
+          </div>
+        </div>
+
+        <p>
+          <code>CEvent</code> is the <strong>main game controller</strong>. It sits at the top
+          of the game stack, receiving all Windows messages and routing them to the appropriate
+          subsystem. It implements the game phase dispatch loop, coordinates input, drives the
+          render/update cycle, and manages transitions between screens and modes.
+        </p>
+
+        <h2 id="responsibilities">Responsibilities</h2>
+        <ul>
+          <li>Receives all Win32 messages from <code>WinProc()</code> in <code>blupi.cpp</code></li>
+          <li>Dispatches <code>WM_PHASE_*</code> messages to phase-specific handlers</li>
+          <li>Reads keyboard and mouse input each tick</li>
+          <li>Converts raw input into <code>KEY_*</code> bitmasks and sends them to <code>CDecor::SetInput()</code></li>
+          <li>Drives the main game timer and tick loop</li>
+          <li>Manages menu navigation, UI interaction, and screen transitions</li>
+          <li>Coordinates with <code>CDecor</code>, <code>CPixmap</code>, <code>CSound</code>, and <code>CNetwork</code></li>
+        </ul>
+
+        <h2 id="phase-dispatch">Game Phase Dispatch</h2>
+        <p>
+          The game is divided into over 60 phases, each represented as a <code>WM_PHASE_*</code>
+          constant. <code>CEvent</code> maintains the current phase and routes each
+          <code>WM_USER + N</code> message to the handler for phase N.
+        </p>
+        <p>
+          See <a href="../reference/game-phases.html">Game Phases Reference</a> for the complete
+          <code>WM_PHASE_*</code> table.
+        </p>
+        <pre><code><span class="cmt">// Message loop pseudocode</span>
+<span class="kw">switch</span> (message) {
+  <span class="kw">case</span> WM_PHASE_PLAY:    HandlePlay();    <span class="kw">break</span>;
+  <span class="kw">case</span> WM_PHASE_MENU:    HandleMenu();    <span class="kw">break</span>;
+  <span class="kw">case</span> WM_PHASE_PAUSE:   HandlePause();   <span class="kw">break</span>;
+  <span class="cmt">// ... 60+ more phases</span>
+}</code></pre>
+
+        <h2 id="input-flow">Input Flow</h2>
+        <ol>
+          <li>OS delivers keyboard/mouse events to <code>WinProc()</code></li>
+          <li><code>CEvent</code> accumulates key state into a <code>KEY_*</code> bitmask each tick</li>
+          <li>Bitmask is passed to <code>CDecor::SetInput(keys)</code></li>
+          <li><code>CDecor</code> applies the input to player physics in the next <code>MoveStep()</code></li>
+          <li>Mouse position drives UI interaction inside <code>CEvent</code> phase handlers</li>
+        </ol>
+        <p>
+          See <a href="../reference/game-constants.html#input">KEY_* bitmask values</a> and
+          <a href="../input.html">Input System</a> for more detail.
+        </p>
+
+        <h2 id="timer">Game Timer</h2>
+        <p>
+          <code>CEvent</code> controls the game timer.
+          On each Windows timer tick, it calls <code>CDecor::MoveStep()</code> to advance the
+          simulation and then calls <code>CDecor::Build()</code> to render the updated world.
+          The timer tick interval is set in <code>config.def</code> via the <code>Timer</code> key (10–1000 ms); the speed multiplier via <code>SpeedRate</code> (1–2).
+        </p>
+
+        <h2 id="platforms">Platform Notes</h2>
+        <p>
+          On WebAssembly (Emscripten), the blocking Win32 message loop is replaced by
+          Emscripten's main-loop callback. The phase dispatch and input handling remain
+          the same; only the loop driver changes.
+        </p>
+        <p>
+          On Android, touch events are mapped to mouse/keyboard equivalents before being
+          fed into <code>CEvent</code>'s normal input path.
+        </p>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="csound.html">← <span class="pnl-label">CSound</span></a>
+          <a class="page-nav-link next" href="cnetwork.html"><span class="pnl-label">CNetwork</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('cevent');</script>
+</body>
+</html>

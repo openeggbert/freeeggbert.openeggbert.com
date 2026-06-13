@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Overview — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Project Overview</span>
+        </nav>
+
+        <h1>Project Overview</h1>
+
+        <h2 id="what-is-it">What Is Free Eggbert?</h2>
+        <p>
+          <strong>Free Eggbert</strong> is an open-source reconstruction of
+          <strong>Speedy Eggbert 2</strong> (also known as <em>Speedy Blupi II</em>),
+          a side-scrolling platformer originally developed for Windows using
+          <strong>DirectX 3</strong> in the late 1990s. The original game's source code was
+          never publicly released, so this project is based on decompiled and
+          reverse-engineered binary code.
+        </p>
+
+        <h2 id="classification">Project Classification</h2>
+        <p>
+          Free Eggbert is a <strong>reverse-engineering and preservation project</strong>,
+          not a clone or remake. The goal is to reconstruct the original game logic as accurately
+          as possible from binary analysis, not to rewrite or reinvent it.
+        </p>
+
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            <div class="callout-title">Preservation Focus</div>
+            The decompiled code is intentionally kept close to the original structure,
+            including many quirks and idiomatic patterns from the original binary.
+            The <code>_LEGACY</code> compile flag preserves known bugs for accuracy.
+          </div>
+        </div>
+
+        <h2 id="tools-used">Reverse Engineering Tools</h2>
+        <ul>
+          <li><strong>Ghidra</strong> — Binary analysis, decompilation, and control-flow reconstruction</li>
+          <li><strong>IDA</strong> — Binary disassembly and additional analysis</li>
+          <li><strong>ILSpy</strong> — Inspection of the 2013 Windows Phone port of Speedy Blupi, which preserved demangled C++ symbol names</li>
+          <li><strong>Planet Blupi source</strong> — The official open-source release of the shared ancestor engine, used as a behavioral reference</li>
+        </ul>
+        <p>
+          Special thanks to <strong>Ч.У.Ш</strong> from the 4PDA forum for archiving
+          the obscure 2013 Windows Phone port, which provided invaluable symbol names.
+        </p>
+
+        <h2 id="original-game">Original Game</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Property</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td>Title</td><td>Speedy Eggbert 2 / Speedy Blupi II</td></tr>
+              <tr><td>Genre</td><td>Side-scrolling platformer</td></tr>
+              <tr><td>Original platform</td><td>Win32, DirectX 3</td></tr>
+              <tr><td>Executable name</td><td><code>SPEEDY_BLUPI_WINDOWS</code></td></tr>
+              <tr><td>Source availability</td><td>Never officially released</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="tech-stack">Technology Stack</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Component</th><th>Technology</th></tr></thead>
+            <tbody>
+              <tr><td>Language</td><td>C++20</td></tr>
+              <tr><td>Cross-platform backend</td><td>Free Direct (SDL3-based DirectDraw/DirectSound replacement)</td></tr>
+              <tr><td>Platform abstraction</td><td>Free API (Win32 → cross-platform)</td></tr>
+              <tr><td>Audio (default)</td><td>DirectSound / MCI path (<code>_BASS=FALSE</code>)</td></tr>
+              <tr><td>Audio (alternative)</td><td>BASS + BASSMIDI library</td></tr>
+              <tr><td>Networking</td><td>DirectPlay (DirectX 3) — incomplete</td></tr>
+              <tr><td>Build system</td><td>CMake (primary), Visual Studio 2022 (Windows), Gradle (Android)</td></tr>
+              <tr><td>Web target</td><td>Emscripten → WebAssembly</td></tr>
+              <tr><td>Mobile target</td><td>Android NDK</td></tr>
+              <tr><td>License</td><td>GPLv3</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="current-status">Current Status</h2>
+        <p>Gameplay is <strong>partially functional</strong> but the game is still defective and many features are incomplete, inaccurate, or missing. From the README:</p>
+        <ul>
+          <li>The game builds and runs on multiple platforms via the FreeDirect/SDL3 backend</li>
+          <li>Some gameplay elements work; physics and AI need the most work</li>
+          <li>Network multiplayer fails silently; the game falls back to single-player</li>
+          <li>Save/load may have version compatibility gaps</li>
+          <li>The level editor has known missing features</li>
+        </ul>
+
+        <h2 id="goals">Project Goals</h2>
+        <ul>
+          <li>Improve accuracy of the decompiled source code</li>
+          <li>Restore missing or defective gameplay behavior</li>
+          <li>Add Doxygen documentation to all headers and source files</li>
+          <li>Add support for Free Direct via CMake (in progress)</li>
+          <li>Make the game portable to additional platforms beyond Windows</li>
+          <li>Investigate and complete Android support</li>
+          <li>Investigate and complete web browser support</li>
+        </ul>
+
+        <h2 id="relationship-to-planet-blupi">Relationship to Planet Blupi</h2>
+        <p>
+          Free Eggbert and Planet Blupi share common ancestry — the original Speedy Eggbert 2
+          was a fork or sequel of the Planet Blupi game engine. However, they are
+          <strong>separate and independent projects</strong>. For a detailed comparison,
+          see <a href="free-eggbert-vs-original.html">Free Eggbert vs. Speedy Blupi</a>.
+        </p>
+
+        <h2 id="disclaimer">Disclaimer</h2>
+        <p>
+          This project is intended for research, preservation, documentation, and
+          compatibility work. It is not an official release of the original game source code.
+          Game assets (DATA, IMAGE08, IMAGE16, SOUND directories) are copyright of their
+          respective owners, are not included in this repository, and must be obtained
+          separately from an original copy of Speedy Eggbert 2.
+        </p>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="index.html">← <span class="pnl-label">Home</span></a>
+          <a class="page-nav-link next" href="getting-started.html"><span class="pnl-label">Getting Started</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('overview');</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compile Flags — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Reference</a>
+          <span class="sep">/</span>
+          <span class="current">Compile Flags</span>
+        </nav>
+
+        <h1>Compile Flags</h1>
+        <p>
+          Compile-time feature flags defined in <code>include/def.hpp</code> via
+          <code>#define</code>. These cannot be changed at runtime.
+        </p>
+
+        <h2 id="feature-flags">Feature Flags</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>_DEMO</code></td>
+                <td><code>FALSE</code></td>
+                <td>Enable demo mode — limited content, no save/load</td>
+              </tr>
+              <tr>
+                <td><code>_EGAMES</code></td>
+                <td><code>FALSE</code></td>
+                <td>Enable eGames retail version behavior</td>
+              </tr>
+              <tr>
+                <td><code>_SE</code></td>
+                <td><code>FALSE</code></td>
+                <td>eGames Special Edition variant</td>
+              </tr>
+              <tr>
+                <td><code>_INTRO</code></td>
+                <td><code>FALSE</code></td>
+                <td>Show intro images at startup</td>
+              </tr>
+              <tr>
+                <td><code>_CD</code></td>
+                <td><code>FALSE</code></td>
+                <td>Require the game CD to be present (<code>WM_PHASE_INSERT</code> / <code>WM_PHASE_TESTCD</code>)</td>
+              </tr>
+              <tr>
+                <td><code>_BYE</code></td>
+                <td><code>!_EGAMES</code></td>
+                <td>Show exit/goodbye image (similar to <code>_INTRO</code>)</td>
+              </tr>
+              <tr>
+                <td><code>_LEGACY</code></td>
+                <td><code>FALSE</code></td>
+                <td>Keep broken/quirky legacy code from the decompilation for accuracy. When <code>TRUE</code>, restores original bugs.</td>
+              </tr>
+              <tr>
+                <td><code>_DREAM</code></td>
+                <td><code>TRUE</code></td>
+                <td>Allow Dream-mode blocks when loading levels. Current default enables Dream mode.</td>
+              </tr>
+              <tr>
+                <td><code>_BASS</code></td>
+                <td><code>FALSE</code></td>
+                <td>Use the BASS audio library instead of the DirectSound/MCI path. <code>FALSE</code> = DirectSound/MCI (default). <code>TRUE</code> = BASS + BASSMIDI.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            <div class="callout-title">_LEGACY and _DREAM</div>
+            <code>_DREAM=TRUE</code> is the current default to support Dream-mode levels.
+            <code>_LEGACY=TRUE</code> restores original bugs and quirks from the binary — useful
+            for accuracy testing but not recommended for normal use.
+          </div>
+        </div>
+
+        <h2 id="sec-powerups">Security Power-Up States (SEC_*)</h2>
+        <p>
+          Active security/power-up states for the player character.
+          Defined as an enum in <code>include/def.hpp</code>.
+          The current active state is tracked in the player's SEC field.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Enum</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>SEC_SHIELD</code></td><td>1</td><td>Shield active — player is temporarily invulnerable</td></tr>
+              <tr><td><code>SEC_POWER</code></td><td>2</td><td>Power-up lollipop active — speed or power boost</td></tr>
+              <tr><td><code>SEC_CLOUD</code></td><td>3</td><td>Cloud invisibility active — player is invisible to enemies</td></tr>
+              <tr><td><code>SEC_HIDE</code></td><td>4</td><td>Hidden state active — related to cloud invisibility</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="changing-flags">Changing Flags</h2>
+        <p>To change a flag, edit <code>include/def.hpp</code> directly and rebuild:</p>
+        <pre><code><span class="cmt">// Example: enable BASS audio</span>
+<span class="kw">#define</span> _BASS TRUE
+
+<span class="cmt">// Example: enable legacy mode</span>
+<span class="kw">#define</span> _LEGACY TRUE</code></pre>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="data-structures.html">← <span class="pnl-label">Data Structures</span></a>
+          <a class="page-nav-link next" href="game-constants.html"><span class="pnl-label">Game Constants</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('compile-flags');</script>
+</body>
+</html>

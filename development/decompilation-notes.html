@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Decompilation Notes — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Developer Guide</a>
+          <span class="sep">/</span>
+          <span class="current">Decompilation Notes</span>
+        </nav>
+
+        <h1>Decompilation Notes</h1>
+        <p>
+          Free Eggbert is a reconstruction of Speedy Eggbert 2 (Speedy Blupi II) from
+          its compiled binary. This page documents where symbol names come from,
+          confirmed decompilation bugs, and how the codebase relates to Planet Blupi.
+        </p>
+
+        <h2 id="symbol-sources">Source of Symbol Names</h2>
+        <p>
+          Many function and variable names come from the
+          <strong>2013 Windows Phone port of Speedy Blupi</strong>, inspected using
+          <strong>ILSpy</strong>. This port is a C++ to C# transpilation that retained
+          demangled C++ symbol names, making it possible to recover original function and
+          variable names from the compiled binary.
+        </p>
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            Credit to <strong>Ч.У.Ш</strong> from the 4PDA forum for archiving this obscure
+            Windows Phone 2013 port, which would otherwise be lost.
+          </div>
+        </div>
+        <p>The reconstruction uses three main tools:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tool</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Ghidra</strong></td>
+                <td>Primary decompilation — produces C-like pseudocode from the binary</td>
+              </tr>
+              <tr>
+                <td><strong>IDA Pro</strong></td>
+                <td>Cross-reference disassembly — used to verify Ghidra output and resolve ambiguous patterns</td>
+              </tr>
+              <tr>
+                <td><strong>ILSpy</strong></td>
+                <td>Symbol name recovery from the Windows Phone 2013 C# port</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="known-bugs">Known Decompilation Bugs</h2>
+
+        <h3 id="double-create">Double CPixmap::Create() Call</h3>
+        <p>
+          The decompiled startup code calls <code>CPixmap::Create()</code> twice: once directly
+          in <code>DoInit()</code> and again inside <code>CacheAll(TRUE, ...)</code>.
+          This is most likely a decompilation artifact — the second call was probably not in
+          the original source.
+        </p>
+        <p>
+          Under real DirectDraw 3 this can cause errors such as
+          <code>DDERR_PRIMARYSURFACEALREADYEXISTS</code>.
+          Free Direct currently tolerates it. See <a href="known-issues.html#directdraw">Known Issues — DirectDraw</a>
+          for the full investigation checklist.
+        </p>
+
+        <h3 id="parameter-swap">Parameter Swap Bug</h3>
+        <p>
+          The <code>bTrueColorBack</code> and <code>bTrueColorDecor</code> parameters in
+          <code>CPixmap::Create()</code> are in the wrong order between the declaration
+          (<code>pixmap.hpp</code>) and the definition (<code>pixmap.cpp</code>):
+        </p>
+        <pre><code><span class="cmt">// pixmap.hpp — declaration</span>
+BOOL Create(HWND, POINT, BOOL bFullScreen, <span class="kw2">int</span> mouseType,
+            BOOL bTrueColor, BOOL bTrueColorDecor);
+
+<span class="cmt">// pixmap.cpp — definition (params SWAPPED)</span>
+BOOL CPixmap::Create(HWND, POINT, BOOL bFullScreen, <span class="kw2">int</span> mouseType,
+                     BOOL bTrueColorDecor, BOOL bTrueColor);</code></pre>
+        <p>
+          The function then assigns <code>m_bTrueColorDecor = bTrueColorDecor</code> and
+          <code>m_bTrueColorBack = bTrueColor</code> — so the caller's first extra parameter
+          ends up controlling decor, not back. This is likely a decompilation artifact from
+          incorrect calling-convention reconstruction.
+        </p>
+
+        <h3 id="delete-this">Unsafe delete this</h3>
+        <p>
+          Some decompiled code contains <code>delete this</code> patterns copied directly
+          from the binary. In <code>CPixmap::CacheAll(FALSE)</code>, the object is destroyed
+          with <code>delete this</code> and then its own member variables are immediately read —
+          which is undefined behavior in C++.
+        </p>
+        <p>
+          This is either a decompilation artifact or a very unusual pattern from the original
+          code that requires careful reconstruction. The <code>_LEGACY</code> flag gates this
+          behavior.
+        </p>
+
+        <h3 id="rectangle-init">Nonsensical Rectangle Initialization</h3>
+        <p>
+          In <code>CPixmap::CacheAll(TRUE)</code>, Ghidra produced this decompiled output:
+        </p>
+        <pre><code><span class="cmt">// Ghidra output — nonsensical</span>
+<span class="kw2">char</span> image[12];
+*(<span class="kw2">char</span>*)image = (LXIMAGE) &lt;&lt; 64;
+rect.bottom = LYIMAGE;
+rect.left   = LOWORD(image);
+rect.top    = HIWORD(image);
+rect.right  = HIWORD(image);</code></pre>
+        <p>
+          <code>LXIMAGE &lt;&lt; 64</code> is nonsensical (result is always 0 for a 32-bit int).
+          <code>LOWORD</code>/<code>HIWORD</code> on a local <code>char</code> array is incorrect.
+          The original code was almost certainly a simple rectangle initialization like:
+        </p>
+        <pre><code>SetRect(&amp;rect, 0, 0, LXIMAGE, LYIMAGE);</code></pre>
+
+        <h3 id="uninitialized-vars">Uninitialized Variables</h3>
+        <p>
+          The original binary was compiled with aggressive optimizations that reused stack
+          space and registers. The decompiled pseudocode has many apparently uninitialized
+          variables that were actually initialized by the original compiler's register
+          allocation strategy. These produce <code>C4700</code>/<code>C4703</code> MSVC warnings.
+        </p>
+        <p>
+          The CMake configuration suppresses these with <code>/wd4700 /wd4703</code> on MSVC.
+          They are intentional suppressors for this class of decompilation artifacts.
+        </p>
+
+        <h2 id="legacy-flag">The _LEGACY Flag</h2>
+        <p>
+          When <code>_LEGACY=TRUE</code> (default: <code>FALSE</code>), the codebase retains
+          intentionally broken or quirky behaviors from the original decompiled output.
+          Setting <code>_LEGACY=FALSE</code> enables fixes for confirmed bugs.
+        </p>
+        <p>
+          The flag is defined in <code>include/def.hpp</code> and gates behaviors like:
+        </p>
+        <ul>
+          <li>The <code>delete this</code> pattern in <code>CacheAll(FALSE)</code></li>
+          <li>Other confirmed decompilation artifacts once they are identified and fixed</li>
+        </ul>
+        <p>
+          See <a href="../reference/compile-flags.html">Compile Flags</a> for all flag defaults and how to change them.
+        </p>
+
+        <h2 id="planet-blupi">Comparison with Planet Blupi</h2>
+        <p>
+          Where behavior is ambiguous in the decompiled output, the
+          <strong>Planet Blupi source code</strong> (the official open-source release of
+          Epsitec's original engine) serves as a reference implementation.
+          Planet Blupi is the engine used in Planet Blupi / Blupi à la rescousse, which
+          shares common heritage with Speedy Blupi II.
+        </p>
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            Planet Blupi uses a <code>Blupi[100]</code> array for up to 100 simultaneous
+            characters. Free Eggbert stores the single player as individual member fields
+            in <code>CDecor</code>. Despite shared heritage, the player models differ significantly.
+          </div>
+        </div>
+        <p>
+          See <a href="../free-eggbert-vs-original.html">Free Eggbert vs. Speedy Blupi</a> for
+          a full comparison table.
+        </p>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="known-issues.html">← <span class="pnl-label">Known Issues</span></a>
+          <a class="page-nav-link next" href="../reverse-engineering.html"><span class="pnl-label">Reverse Engineering</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('decompilation');</script>
+</body>
+</html>

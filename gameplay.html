@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gameplay Overview — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Gameplay Overview</span>
+        </nav>
+
+        <h1>Gameplay Overview</h1>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Work in Progress</div>
+            Gameplay is partially functional. Many behaviors documented here are derived from
+            code analysis and may not work correctly in the current build. Features marked
+            <span class="badge badge-verify">Needs Verification</span> should be tested.
+          </div>
+        </div>
+
+        <h2 id="game-type">Game Type</h2>
+        <p>
+          Speedy Eggbert 2 (Free Eggbert) is a <strong>side-scrolling platformer</strong>.
+          The player controls "Blupi" (Eggbert) through a series of levels, collecting
+          items, avoiding enemies, using vehicles, and activating switches to progress.
+        </p>
+
+        <h2 id="world">World Structure</h2>
+        <ul>
+          <li>Each level is a <strong>100×100 grid</strong> of cells</li>
+          <li>Levels are organized into <strong>chapters</strong> (worlds 010–199, plus bonus and secret worlds)</li>
+          <li>Each level has a name, background music track, and visual region/theme</li>
+          <li>Up to 4 player start positions per level (for multiplayer)</li>
+        </ul>
+
+        <h2 id="player">Player Character</h2>
+        <p>
+          The player character is "Blupi" — a small anthropomorphic creature.
+          Player state is tracked in <code>CDecor</code> via individual member fields
+          (<code>m_blupiPos</code>, <code>m_blupiAction</code>, etc.).
+        </p>
+
+        <h3 id="movement">Movement States</h3>
+        <p>Character animation and behavior are controlled by <code>ACTION_*</code> codes.
+           Key movement states include:</p>
+        <ul>
+          <li><strong>Walking</strong> — <code>ACTION_MARCH</code></li>
+          <li><strong>Jumping</strong> — <code>ACTION_JUMP</code> (start), <code>ACTION_AIR</code> (mid-air)</li>
+          <li><strong>Looking up/down</strong> — <code>ACTION_UP</code>, <code>ACTION_DOWN</code></li>
+          <li><strong>Edge vertigo</strong> — <code>ACTION_VERTIGO</code> (standing at edge)</li>
+          <li><strong>Teleporting</strong> — <code>ACTION_TELEPORTE</code></li>
+        </ul>
+        <p>See the full <a href="reference/action-codes.html">Action Codes Reference</a> for all 87 states.</p>
+
+        <h3 id="vehicles">Vehicles</h3>
+        <p>Blupi can enter and operate several vehicles:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Vehicle</th><th>Object Type</th><th>Transport Mode</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>Helicopter</td><td><code>TYPE_HELICO</code> / <code>TYPE_BLUPIHELICO</code></td><td>1</td><td>Aerial vehicle, can fly over obstacles</td></tr>
+              <tr><td>Jeep</td><td><code>TYPE_JEEP</code></td><td>2</td><td>Fast ground vehicle</td></tr>
+              <tr><td>Tank</td><td><code>TYPE_TANK</code> / <code>TYPE_BLUPITANK</code></td><td>3</td><td>Can fire bullets (<code>TYPE_BULLET</code>)</td></tr>
+              <tr><td>Hovercraft</td><td><code>TYPE_OVER</code></td><td>—</td><td>Flies at fixed height (<code>OVERHEIGHT=80px</code>)</td></tr>
+              <tr><td>Skateboard</td><td><code>TYPE_SKATE</code></td><td>—</td><td>Fast ground movement; can be picked up/dropped</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="swimming">Swimming</h3>
+        <p>Blupi can enter water with different states:</p>
+        <ul>
+          <li><strong>Deep water</strong> — <code>ACTION_STOPNAGE</code>, <code>ACTION_MARCHNAGE</code></li>
+          <li><strong>Water surface</strong> — <code>ACTION_STOPSURF</code>, <code>ACTION_MARCHSURF</code></li>
+          <li><strong>Drowning</strong> — <code>ACTION_DROWN</code></li>
+        </ul>
+
+        <h2 id="enemies">Enemies</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Enemy</th><th>Type Constant</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>Fish</td><td><code>TYPE_POISSON</code></td><td>Aquatic enemy</td></tr>
+              <tr><td>Bird</td><td><code>TYPE_OISEAU</code></td><td>Aerial enemy</td></tr>
+              <tr><td>Wasp</td><td><code>TYPE_GUEPE</code></td><td>Stings Blupi, causing balloon swelling (<code>ACTION_BALLOON</code>)</td></tr>
+              <tr><td>Tentacle</td><td><code>TYPE_TENTACULE</code></td><td>Slime tentacle effect</td></tr>
+              <tr><td>Creature</td><td><code>TYPE_CREATURE</code></td><td>Moving slime creature</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="hazards">Hazards</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Hazard</th><th>Type</th><th>Effect</th></tr></thead>
+            <tbody>
+              <tr><td>Floor bomb</td><td><code>TYPE_BOMBEDOWN</code></td><td>Explodes on contact</td></tr>
+              <tr><td>Hanging bomb</td><td><code>TYPE_BOMBEUP</code></td><td>Explodes on contact from above</td></tr>
+              <tr><td>Moving bomb</td><td><code>TYPE_BOMBEMOVE</code></td><td>Patrols a path</td></tr>
+              <tr><td>Homing bomb</td><td><code>TYPE_BOMBEFOLLOW1/2</code></td><td>Follows the player</td></tr>
+              <tr><td>Glue ball</td><td><code>TYPE_BALLE</code></td><td>Traps Blupi in place (<code>ACTION_GLU</code>)</td></tr>
+              <tr><td>Electrocution</td><td><code>TYPE_ELECTRO</code></td><td>Electrocutes Blupi (<code>ACTION_ELECTRO</code>)</td></tr>
+              <tr><td>Pollution</td><td><code>TYPE_POLLUTION</code></td><td>Toxic zone effect</td></tr>
+              <tr><td>Inversion</td><td><code>TYPE_INVERT</code></td><td>Inverts player controls (<code>blupiInvert</code>)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="collectibles">Collectibles</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Item</th><th>Type</th><th>Effect</th></tr></thead>
+            <tbody>
+              <tr><td>Treasure</td><td><code>TYPE_TRESOR</code></td><td>Increases <code>nbTresor</code> count</td></tr>
+              <tr><td>Egg</td><td><code>TYPE_EGG</code></td><td>Collectible item</td></tr>
+              <tr><td>Gold key</td><td><code>TYPE_CLE</code></td><td>Opens gold-locked doors</td></tr>
+              <tr><td>Red key</td><td><code>TYPE_CLE1</code></td><td>Opens red-locked doors</td></tr>
+              <tr><td>Green key</td><td><code>TYPE_CLE2</code></td><td>Opens green-locked doors</td></tr>
+              <tr><td>Blue key</td><td><code>TYPE_CLE3</code></td><td>Opens blue-locked doors</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="power-ups">Power-Ups</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Power-up</th><th>Type / SEC_ flag</th><th>Effect</th></tr></thead>
+            <tbody>
+              <tr><td>Shield</td><td><code>TYPE_SHIELD</code> / <code>SEC_SHIELD</code></td><td>Temporary invulnerability</td></tr>
+              <tr><td>Lollipop</td><td><code>TYPE_POWER</code> / <code>SEC_POWER</code></td><td>Speed or power boost; eating animation <code>ACTION_SUCETTE</code></td></tr>
+              <tr><td>Cloud</td><td><code>SEC_CLOUD</code></td><td>Invisibility/cloud mode</td></tr>
+              <tr><td>Dynamite</td><td><code>TYPE_DYNAMITE</code></td><td>Placeable explosive; count tracked in <code>blupiDynamite</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="level-mechanics">Level Mechanics</h2>
+        <ul>
+          <li><strong>Crates</strong> (<code>TYPE_CAISSE</code>) — pushable and pullable boxes (<code>ACTION_PUSH</code>, <code>ACTION_POP</code>)</li>
+          <li><strong>Doors</strong> (<code>TYPE_DOOR</code>) — opened with matching keys; states tracked in <code>doors[200]</code></li>
+          <li><strong>Goal/Exit</strong> (<code>TYPE_GOAL</code>) — level completion trigger</li>
+          <li><strong>Lifts/Elevators</strong> (<code>TYPE_ASCENSEUR</code>) — moving platforms</li>
+          <li><strong>Conveyor belts</strong> (<code>TYPE_ASCENSEURs/si</code>) — move Blupi left or right</li>
+          <li><strong>Bridges</strong> (<code>TYPE_BRIDGE</code>) — fragile bridges that collapse</li>
+          <li><strong>Hanging bars</strong> — Blupi can hang and traverse (<code>ACTION_STOPSUSPEND</code>, etc.)</li>
+          <li><strong>Springs</strong> — bounce Blupi (<code>SOUND_RESSORT</code>)</li>
+          <li><strong>Switches</strong> — toggle doors or other mechanisms</li>
+          <li><strong>Teleporters</strong> — transport Blupi to another location</li>
+        </ul>
+
+        <h2 id="win-lose">Win / Lose Conditions</h2>
+        <ul>
+          <li><strong>Win</strong> — Reach the goal (<code>TYPE_GOAL</code>); triggers <code>WM_PHASE_WIN</code></li>
+          <li><strong>Lose</strong> — All lives depleted; tracked in <code>nbVies</code></li>
+          <li><strong>Treasures</strong> — Collecting all treasures (<code>nbTresor == totalTresor</code>) may trigger special win condition</li>
+        </ul>
+
+        <h2 id="cheat-codes">Cheat Codes</h2>
+        <p>
+          25 cheat codes are defined in <code>src/event.cpp</code> (<code>cheat_code[25][60]</code>)
+          and handled by <code>CEvent</code> and <code>CDecor::CheatAction()</code>.
+          Type the code on the keyboard during gameplay (or on the title screen for some codes).
+          A sound plays if the code is accepted.
+        </p>
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            All codes must start with a <strong>unique first letter</strong> (enforced by the
+            matching algorithm in <code>event.cpp</code>).
+            Most gameplay cheats only work during <code>WM_PHASE_PLAY</code> or
+            <code>WM_PHASE_PLAYTEST</code>.
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Code</th><th>Effect</th><th>Where</th></tr></thead>
+            <tbody>
+              <tr><td>0</td><td><code>XMISSION</code></td><td>Toggle build/official missions modifier (<code>SetBuildOfficialMissions</code>)</td><td>Any</td></tr>
+              <tr><td>1</td><td><code>OPENDOORS</code></td><td>Toggle all world-map doors/missions accessible (<code>m_bAllMissions</code>)</td><td>Any</td></tr>
+              <tr><td>2</td><td><code>CLEANALL</code></td><td>Explode all enemies currently on screen</td><td>Gameplay</td></tr>
+              <tr><td>3</td><td><code>MEGABLUPI</code></td><td>Toggle player invincibility (<code>m_bSuperBlupi</code>)</td><td>Any</td></tr>
+              <tr><td>4</td><td><code>LAYEGG</code></td><td>Give +1 life (or set lives to 10 during gameplay)</td><td>Any</td></tr>
+              <tr><td>5</td><td><code>KILLEGG</code></td><td>Remove 1 life</td><td>Any</td></tr>
+              <tr><td>6</td><td><code>FUNSKATE</code></td><td>Immediately put player on skateboard</td><td>Gameplay</td></tr>
+              <tr><td>7</td><td><code>GIVECOPTER</code></td><td>Immediately give player helicopter</td><td>Gameplay</td></tr>
+              <tr><td>8</td><td><code>JEEPDRIVE</code></td><td>Immediately put player in jeep</td><td>Gameplay</td></tr>
+              <tr><td>9</td><td><code>ALLTREASURE</code></td><td>Collect all remaining treasures in the level</td><td>Gameplay</td></tr>
+              <tr><td>10</td><td><code>ENDGOAL</code></td><td>Teleport to goal and win the level (only if all treasures collected)</td><td>Gameplay</td></tr>
+              <tr><td>11</td><td><code>SHOWSECRET</code></td><td>Toggle showing hidden/secret objects (<code>m_bDrawSecret</code>)</td><td>Any</td></tr>
+              <tr><td>12</td><td><code>ROUNDSHIELD</code></td><td>Activate shield power-up (100 ticks)</td><td>Gameplay</td></tr>
+              <tr><td>13</td><td><code>QUICKLOLLIPOP</code></td><td>Activate lollipop power-up (<code>ACTION_SUCETTE</code>)</td><td>Gameplay</td></tr>
+              <tr><td>14</td><td><code>TENBOMBS</code></td><td>Give 10 personal bombs (<code>m_blupiPerso = 10</code>)</td><td>Gameplay</td></tr>
+              <tr><td>15</td><td><code>BIRDLIME</code></td><td>Give 10 glue shots (<code>m_blupiBullet = 10</code>)</td><td>Gameplay</td></tr>
+              <tr><td>16</td><td><code>DRIVETANK</code></td><td>Immediately put player in tank</td><td>Gameplay</td></tr>
+              <tr><td>17</td><td><code>POWERCHARGE</code></td><td>Activate tank power charge attack (<code>ACTION_CHARGE</code>)</td><td>Gameplay</td></tr>
+              <tr><td>18</td><td><code>HIDEDRINK</code></td><td>Activate drink/invisibility (<code>ACTION_DRINK</code>)</td><td>Gameplay</td></tr>
+              <tr><td>19</td><td><code>NETPACKED</code></td><td>Toggle network packed mode (debug)</td><td>Any</td></tr>
+              <tr><td>20</td><td><code>ZNETDEBUG</code></td><td>Toggle network debug mode</td><td>Any</td></tr>
+              <tr><td>21</td><td><code>YNOSMOOTH</code></td><td>Toggle network move prediction (no-smooth mode)</td><td>Any</td></tr>
+              <tr><td>22</td><td><code>IOVERCRAFT</code></td><td>Immediately put player in hovercraft</td><td>Gameplay</td></tr>
+              <tr><td>23</td><td><code>UDYNAMITE</code></td><td>Give 1 dynamite stick (<code>m_blupiDynamite = 1</code>)</td><td>Gameplay</td></tr>
+              <tr><td>24</td><td><code>WELLKEYS</code></td><td>Give all colored keys (red, green, blue)</td><td>Gameplay</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Three of these flags are also serialized in <code>DescSave</code>:
+          <code>bCheatDoors</code> (OPENDOORS), <code>bSuperBlupi</code> (MEGABLUPI), and
+          <code>bDrawSecret</code> (SHOWSECRET) — they persist across save/load.
+          All others are session-only.
+        </p>
+
+        <h2 id="multiplayer-gameplay">Multiplayer Gameplay</h2>
+        <p>
+          Up to <strong>4 players</strong> can play simultaneously via DirectPlay networking.
+          In multiplayer, each player has a personal colored bomb:
+        </p>
+        <ul>
+          <li>Player 1: yellow bomb (<code>TYPE_BOMBEPERSO1</code>)</li>
+          <li>Player 2: orange bomb (<code>TYPE_BOMBEPERSO2</code>)</li>
+          <li>Player 3: blue bomb (<code>TYPE_BOMBEPERSO3</code>)</li>
+          <li>Player 4: green bomb (<code>TYPE_BOMBEPERSO4</code>)</li>
+        </ul>
+        <div class="callout danger">
+          <span class="callout-icon">⛔</span>
+          <div class="callout-body">
+            <div class="callout-title">Multiplayer Currently Broken</div>
+            Network initialization fails silently. The game falls back to single-player.
+            See <a href="systems/network.html">Network System</a> for details.
+          </div>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="project-structure.html">← <span class="pnl-label">Project Structure</span></a>
+          <a class="page-nav-link next" href="controls.html"><span class="pnl-label">Controls</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('gameplay');</script>
+</body>
+</html>

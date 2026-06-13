@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Eggbert vs. Speedy Blupi — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">vs. Speedy Blupi / Planet Blupi</span>
+        </nav>
+
+        <h1>Free Eggbert vs. Speedy Blupi / Planet Blupi</h1>
+        <p>
+          This page explains the relationships between Free Eggbert, Planet Blupi,
+          and the original Speedy Blupi games. These projects share common ancestry
+          but are distinct and must not be confused.
+        </p>
+
+        <h2 id="shared-heritage">Shared Heritage</h2>
+        <p>
+          The original Speedy Eggbert 2 / Speedy Blupi II shares a common engine
+          ancestor with Planet Blupi. Many class names, function patterns, data formats,
+          and constants are similar or identical across these codebases.
+        </p>
+        <p>
+          Free Eggbert developers use the officially open-sourced Planet Blupi source code
+          as a behavioral reference when decompiled output is ambiguous.
+        </p>
+
+        <h2 id="comparison-table">Comparison: Free Eggbert vs. Planet Blupi</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Aspect</th><th>Planet Blupi</th><th>Free Eggbert</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Game genre</td>
+                <td>Isometric RTS/puzzle</td>
+                <td>Side-scrolling platformer</td>
+              </tr>
+              <tr>
+                <td>World grid</td>
+                <td>200×200 cells (2D isometric)</td>
+                <td>100×100 cells (side-scroll)</td>
+              </tr>
+              <tr>
+                <td>Cell size</td>
+                <td>60×30 px isometric</td>
+                <td>Flat grid; objects 64×64 px</td>
+              </tr>
+              <tr>
+                <td>Player characters</td>
+                <td>Up to 100 Blupi units (<code>Blupi[100]</code>)</td>
+                <td>Single player (<code>m_blupi*</code> fields)</td>
+              </tr>
+              <tr>
+                <td>Multiplayer</td>
+                <td>6 players (MAXBLUPI=100 slots)</td>
+                <td>Up to 4 network players (MAXNETPLAYER=4)</td>
+              </tr>
+              <tr>
+                <td>Fog of war</td>
+                <td>Yes (15-pattern quadrant fog)</td>
+                <td>None</td>
+              </tr>
+              <tr>
+                <td>Audio</td>
+                <td>DirectSound / MCI</td>
+                <td>DirectSound or BASS library</td>
+              </tr>
+              <tr>
+                <td>Source origin</td>
+                <td>Official open-source release</td>
+                <td>Decompiled via Ghidra/IDA/ILSpy</td>
+              </tr>
+              <tr>
+                <td>Header extension</td>
+                <td><code>.h</code></td>
+                <td><code>.hpp</code></td>
+              </tr>
+              <tr>
+                <td>Repository</td>
+                <td><code>planetblupi/</code></td>
+                <td><code>free-eggbert/</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="important-distinctions">Important Distinctions</h2>
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Do Not Confuse These Projects</div>
+            Free Eggbert and Planet Blupi are <strong>maintained independently</strong>.
+            Code patterns, APIs, and behaviors may appear similar but diverge in important ways.
+            Do not assume Planet Blupi behavior applies to Free Eggbert without verification.
+          </div>
+        </div>
+
+        <h3 id="player-model">Player Model Difference</h3>
+        <p>
+          In <strong>Planet Blupi</strong>, up to 100 player units are tracked in a
+          <code>Blupi[100]</code> array with separate state for each.
+        </p>
+        <p>
+          In <strong>Free Eggbert</strong>, there is a single player character.
+          Its state is stored as individual member fields directly in <code>CDecor</code>:
+          <code>m_blupiPos</code>, <code>m_blupiAction</code>, <code>m_blupiDir</code>,
+          <code>m_blupiTransport</code>, etc. There is no Blupi array.
+        </p>
+
+        <h3 id="world-grid-diff">World Grid Difference</h3>
+        <p>
+          Planet Blupi's isometric world uses a 200×200 grid with 60×30 px rhombus cells.
+          Free Eggbert uses a flat 100×100 grid with standard rectangular 64×64 px sprites.
+          The level formats are incompatible.
+        </p>
+
+        <h3 id="asset-format">Asset Format</h3>
+        <p>
+          Both projects use the <code>.blp</code> binary format for assets, inherited from
+          the shared engine ancestor. However, the specific file layouts and asset content
+          are completely different between the two games.
+        </p>
+
+        <h2 id="original-vs-reconstruction">Original vs. Reconstruction</h2>
+        <p>
+          Free Eggbert reconstructs <strong>Speedy Eggbert 2 / Speedy Blupi II</strong>,
+          not Planet Blupi. The relationship is:
+        </p>
+        <ul>
+          <li>Planet Blupi → shared ancestor engine codebase (officially open-sourced)</li>
+          <li>Speedy Blupi / Speedy Eggbert 2 → derived from same engine, never open-sourced</li>
+          <li>Free Eggbert → reconstruction of Speedy Blupi II from decompiled binary</li>
+        </ul>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="reverse-engineering.html">← <span class="pnl-label">Reverse Engineering</span></a>
+          <a class="page-nav-link next" href="known-limitations.html"><span class="pnl-label">Known Limitations</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('vs-original');</script>
+</body>
+</html>

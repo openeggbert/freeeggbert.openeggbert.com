@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architecture — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Architecture</span>
+        </nav>
+
+        <h1>Architecture Overview</h1>
+        <p>
+          Free Eggbert's architecture closely mirrors the original Win32/DirectX 3 game structure,
+          reconstructed from binary analysis. The codebase is structured as a set of cooperating
+          C++ classes managed through a classic Win32 application model.
+        </p>
+
+        <h2 id="layered-architecture">Layered Architecture</h2>
+        <pre><code>┌──────────────────────────────────────┐
+│       Game Logic (C++20)             │
+│  blupi.cpp / CDecor / CEvent / …     │
+├──────────────────────────────────────┤
+│  Free API  (Win32 → cross-platform)  │
+│  Free Direct (DirectX → SDL3)        │
+├──────────────────────────────────────┤
+│  SDL3 / SDL_image / SDL_mixer        │
+└──────────────────────────────────────┘</code></pre>
+        <p>
+          Game code only includes WinAPI-like and DirectX-like compatibility headers
+          (<code>windows.h</code>, <code>ddraw.h</code>, <code>dsound.h</code>, etc.).
+          SDL is never included directly by game source files.
+        </p>
+
+        <h2 id="main-entry">Main Entry Point</h2>
+        <p>
+          <strong>Source file:</strong> <code>src/blupi.cpp</code><br>
+          <strong>Entry function:</strong> <code>WinMain()</code> (Win32-style)
+        </p>
+        <p>
+          <code>blupi.cpp</code> contains the application bootstrap, window creation,
+          message loop, and top-level object instantiation.
+        </p>
+
+        <h3 id="init-sequence">Initialization Sequence</h3>
+        <ol>
+          <li>Create the application window</li>
+          <li>Instantiate <strong>CPixmap</strong> — DirectDraw surface manager</li>
+          <li>Call <code>CPixmap::Create()</code> — initialize display surfaces</li>
+          <li>Call <code>CPixmap::CacheAll(TRUE, …)</code> — load all image assets</li>
+          <li>Instantiate <strong>CSound</strong> — audio system</li>
+          <li>Instantiate <strong>CNetwork</strong> — DirectPlay (fails silently in most configs)</li>
+          <li>Instantiate <strong>CDecor</strong> — game world and logic engine</li>
+          <li>Instantiate <strong>CEvent</strong> — input handler and game phase dispatcher</li>
+          <li>Start multimedia timer for game tick updates</li>
+          <li>Enter the main message loop</li>
+        </ol>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Known Initialization Issue</div>
+            The decompiled code calls <code>CPixmap::Create()</code> twice during startup —
+            once directly, and once inside <code>CPixmap::CacheAll(TRUE, …)</code>.
+            This is a suspected decompilation artifact. Real DirectDraw may reject the
+            second initialization. See <a href="development/known-issues.html">Known Issues</a>.
+          </div>
+        </div>
+
+        <h2 id="main-loop">Main Game Loop</h2>
+        <p>The application uses a classic Win32 message loop with a multimedia timer:</p>
+        <pre><code><span class="cmt">// WinMain (blupi.cpp) — simplified</span>
+g_updateTimer = timeSetEvent(g_timerInterval, g_timerInterval / 4,
+                             TimerStep, NULL, TIME_PERIODIC);
+
+<span class="kw">while</span> (TRUE) {
+    <span class="kw">if</span> (PeekMessage(&amp;msg, NULL, 0, 0, PM_NOREMOVE)) {
+        <span class="kw">if</span> (!GetMessage(&amp;msg, NULL, 0, 0))
+            <span class="kw">return</span> msg.wParam;
+        TranslateMessage(&amp;msg);
+        DispatchMessage(&amp;msg);
+    } <span class="kw">else</span> {
+        <span class="kw">if</span> (!g_bActive) WaitMessage();
+    }
+}</code></pre>
+
+        <p>
+          The timer callback posts update messages. The window procedure handles
+          <code>WM_UPDATE</code> by calling:
+        </p>
+        <pre><code>UpdateFrame();
+SetDecor();
+g_pPixmap-&gt;Display();</code></pre>
+
+        <h2 id="core-classes">Core Classes</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Class</th><th>Header</th><th>Source(s)</th><th>Responsibility</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><a href="modules/cdecor.html"><code>CDecor</code></a></td>
+                <td><code>include/decor.hpp</code></td>
+                <td><code>src/decor*.cpp</code></td>
+                <td>Central game engine — world state, all game logic</td>
+              </tr>
+              <tr>
+                <td><a href="modules/cevent.html"><code>CEvent</code></a></td>
+                <td><code>include/event.hpp</code></td>
+                <td><code>src/event.cpp</code></td>
+                <td>Input handling, game phase dispatch, keyboard/mouse</td>
+              </tr>
+              <tr>
+                <td><a href="modules/cpixmap.html"><code>CPixmap</code></a></td>
+                <td><code>include/pixmap.hpp</code></td>
+                <td><code>src/pixmap.cpp</code></td>
+                <td>DirectDraw surface manager, sprite blitting</td>
+              </tr>
+              <tr>
+                <td><a href="modules/csound.html"><code>CSound</code></a></td>
+                <td><code>include/sound.hpp</code></td>
+                <td><code>src/sound.cpp</code>, <code>src/soundbass.cpp</code></td>
+                <td>Audio playback — DirectSound or BASS backend</td>
+              </tr>
+              <tr>
+                <td><a href="modules/cnetwork.html"><code>CNetwork</code></a></td>
+                <td><code>include/network.hpp</code></td>
+                <td><code>src/network.cpp</code></td>
+                <td>DirectPlay session management, multiplayer</td>
+              </tr>
+              <tr>
+                <td><code>CButton</code></td>
+                <td><code>include/button.hpp</code></td>
+                <td><code>src/button.cpp</code></td>
+                <td>UI button rendering and hit-testing</td>
+              </tr>
+              <tr>
+                <td><code>CJauge</code></td>
+                <td><code>include/jauge.hpp</code></td>
+                <td><code>src/jauge.cpp</code></td>
+                <td>Progress/gauge bar rendering</td>
+              </tr>
+              <tr>
+                <td><code>CMenu</code></td>
+                <td><code>include/menu.hpp</code></td>
+                <td><code>src/menu.cpp</code></td>
+                <td>Menu rendering and navigation</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="cdecor-decomposition">CDecor Source File Decomposition</h2>
+        <p>
+          <code>CDecor</code> is the most important class. Its implementation is split
+          across 8 source files by responsibility:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+            <tbody>
+              <tr><td><code>src/decor.cpp</code></td><td>Initialization, rendering, main step loop, region/music</td></tr>
+              <tr><td><code>src/decblupi.cpp</code></td><td>Player movement, jumping, vehicle logic, physics</td></tr>
+              <tr><td><code>src/decblock.cpp</code></td><td>Block/crate interaction, push/pull, door logic</td></tr>
+              <tr><td><code>src/decmove.cpp</code></td><td>Moving object (enemy/bomb/effect) step logic</td></tr>
+              <tr><td><code>src/decnet.cpp</code></td><td>Network game synchronization and event dispatch</td></tr>
+              <tr><td><code>src/decdesign.cpp</code></td><td>Level editor — place/remove tiles and objects</td></tr>
+              <tr><td><code>src/decio.cpp</code></td><td>Save/load game state to .blp files</td></tr>
+              <tr><td><code>src/dectables.cpp</code></td><td>Static lookup tables for decor</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="world-grid">World Grid System</h2>
+        <p>
+          The game world is a <strong>100×100 grid</strong> of cells.
+          Each cell stores a sprite index into the background/decor spritesheet.
+        </p>
+        <ul>
+          <li>Grid dimensions: <code>MAXCELX</code> × <code>MAXCELY</code> = 100×100</li>
+          <li>Object sprites: 64×64 px (<code>DIMOBJX</code>, <code>DIMOBJY</code>)</li>
+          <li>Player sprites: 60×60 px (<code>DIMBLUPIX</code>, <code>DIMBLUPIY</code>)</li>
+          <li>Explosion sprites: 128×128 px (<code>DIMEXPLOX</code>, <code>DIMEXPLOY</code>)</li>
+        </ul>
+
+        <h2 id="render-channels">Render Channel System</h2>
+        <p>
+          <code>CPixmap</code> manages <strong>15 independent DirectDraw surfaces</strong>,
+          each identified by a channel constant. Layers are composited in order to build the
+          final frame:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Channel</th><th>Value</th><th>Content</th></tr></thead>
+            <tbody>
+              <tr><td><code>CHBACK</code></td><td>0</td><td>Background terrain</td></tr>
+              <tr><td><code>CHOBJECT</code></td><td>1</td><td>Foreground objects and pickups</td></tr>
+              <tr><td><code>CHBLUPI</code></td><td>2</td><td>Player character</td></tr>
+              <tr><td><code>CHDECOR</code></td><td>3</td><td>Decorative overlays</td></tr>
+              <tr><td><code>CHBUTTON</code></td><td>4</td><td>UI buttons</td></tr>
+              <tr><td><code>CHJAUGE</code></td><td>5</td><td>Gauge/progress bars</td></tr>
+              <tr><td><code>CHTEXT</code></td><td>6</td><td>Normal text characters</td></tr>
+              <tr><td><code>CHLITTLE</code></td><td>7</td><td>Small text characters</td></tr>
+              <tr><td><code>CHMAP</code></td><td>8</td><td>Minimap</td></tr>
+              <tr><td><code>CHEXPLO</code></td><td>9</td><td>Explosion sprites</td></tr>
+              <tr><td><code>CHELEMENT</code></td><td>10</td><td>Particle/element effects</td></tr>
+              <tr><td><code>CHBLUPI1–3</code></td><td>11–13</td><td>Player character variants (multiplayer)</td></tr>
+              <tr><td><code>CHTEMP</code></td><td>14</td><td>Temporary scratch surface</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>See <a href="reference/image-channels.html">Image Channels</a> for the full reference.</p>
+
+        <h2 id="game-phases">Game Phase System</h2>
+        <p>
+          Game state is controlled by <strong>game phases</strong>, dispatched as Windows messages
+          (<code>WM_USER + N</code>) and handled by <code>CEvent</code>. Examples:
+        </p>
+        <ul>
+          <li><code>WM_PHASE_INIT</code> — startup initialization</li>
+          <li><code>WM_PHASE_PLAY</code> — normal gameplay</li>
+          <li><code>WM_PHASE_WIN</code> / <code>WM_PHASE_LOST</code> — end of level</li>
+          <li><code>WM_PHASE_SETUP</code> — settings screen</li>
+          <li><code>WM_PHASE_BUILD</code> — level editor</li>
+          <li><code>WM_PHASE_SERVICE</code> / <code>SESSION</code> / <code>MULTI</code> — multiplayer lobby</li>
+        </ul>
+        <p>See <a href="reference/game-phases.html">Game Phases Reference</a> for all 60+ phases.</p>
+
+        <h2 id="object-system">Moving Object System</h2>
+        <p>
+          Up to <strong>200 moving objects</strong> (<code>MAXMOVEOBJECT</code>) can be active
+          simultaneously. They are tracked in a fixed-size <code>MoveObject[200]</code> array
+          within <code>CDecor</code>. Each object has a type (<code>TYPE_*</code>),
+          position, animation state, and motion trajectory.
+        </p>
+        <p>
+          Object types include enemies (fish, bird, wasp), vehicles, bombs,
+          collectibles, and visual effects. See <a href="reference/object-types.html">Object Types</a>.
+        </p>
+
+        <h2 id="player-state">Player State</h2>
+        <p>
+          Unlike the Planet Blupi engine which uses a <code>Blupi[100]</code> array,
+          Free Eggbert stores the player state as individual member fields directly in
+          <code>CDecor</code> (<code>m_blupiPos</code>, <code>m_blupiAction</code>,
+          <code>m_blupiDir</code>, etc.).
+        </p>
+        <p>In multiplayer, up to 4 players are tracked via network packets.</p>
+
+        <h2 id="audio-arch">Audio Architecture</h2>
+        <p>
+          Audio is managed by <code>CSound</code> with two selectable backends
+          controlled by the <code>_BASS</code> compile flag:
+        </p>
+        <ul>
+          <li><strong>Default (<code>_BASS=FALSE</code>)</strong>: <code>src/sound.cpp</code> — DirectSound/MCI path</li>
+          <li><strong>BASS library (<code>_BASS=TRUE</code>)</strong>: <code>src/soundbass.cpp</code> — BASS + BASSMIDI</li>
+        </ul>
+        <p>See <a href="audio.html">Audio System</a> for full documentation.</p>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="platform-support.html">← <span class="pnl-label">Platform Support</span></a>
+          <a class="page-nav-link next" href="project-structure.html"><span class="pnl-label">Project Structure</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('architecture');</script>
+</body>
+</html>

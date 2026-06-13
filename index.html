@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <div class="hero">
+          <h1>Free Eggbert Documentation</h1>
+          <p class="tagline">
+            Open-source reconstruction of <strong>Speedy Eggbert 2</strong> (Speedy Blupi II)
+            — a reverse-engineered side-scrolling platformer originally built for Windows/DirectX&nbsp;3.
+          </p>
+          <div class="status-badges">
+            <span class="hero-badge">Work in Progress</span>
+            <span class="hero-badge">C++20</span>
+            <span class="hero-badge">GPLv3</span>
+            <span class="hero-badge">SDL3 / Cross-platform</span>
+          </div>
+        </div>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Work in Progress</div>
+            Free Eggbert is an active reverse-engineering project. Gameplay is partially functional
+            but many features are incomplete, inaccurate, or missing. This documentation reflects
+            the current state of the repository.
+          </div>
+        </div>
+
+        <h2 id="what-is-free-eggbert">What Is Free Eggbert?</h2>
+        <p>
+          <strong>Free Eggbert</strong> is an open-source reconstruction of
+          <strong>Speedy Eggbert 2</strong> (also known as <em>Speedy Blupi II</em>),
+          a side-scrolling platformer that was originally published for Windows in the late 1990s
+          using DirectX&nbsp;3. The original source code was never publicly released.
+        </p>
+        <p>
+          This project uses binary analysis tools — <strong>Ghidra</strong>, <strong>IDA</strong>,
+          and <strong>ILSpy</strong> (via the 2013 Windows Phone port) — to reconstruct a buildable,
+          documented, and eventually portable version of the game.
+        </p>
+
+        <h2 id="quick-navigation">Quick Navigation</h2>
+        <div class="card-grid">
+          <a class="card" href="getting-started.html">
+            <div class="card-icon">🚀</div>
+            <h3>Getting Started</h3>
+            <p>Clone, build, and run Free Eggbert in minutes.</p>
+          </a>
+          <a class="card" href="build.html">
+            <div class="card-icon">🔨</div>
+            <h3>Build System</h3>
+            <p>CMake, Visual Studio, Emscripten, and Android build instructions.</p>
+          </a>
+          <a class="card" href="architecture.html">
+            <div class="card-icon">🏗️</div>
+            <h3>Architecture</h3>
+            <p>Main loop, rendering pipeline, input, audio, and object system.</p>
+          </a>
+          <a class="card" href="project-structure.html">
+            <div class="card-icon">📁</div>
+            <h3>Project Structure</h3>
+            <p>Directory layout, source files, headers, assets, and build files.</p>
+          </a>
+          <a class="card" href="reference/index.html">
+            <div class="card-icon">📋</div>
+            <h3>Reference</h3>
+            <p>Complete ACTION_*, TYPE_*, SOUND_*, WM_PHASE_* constant tables.</p>
+          </a>
+          <a class="card" href="modules/cdecor.html">
+            <div class="card-icon">🎮</div>
+            <h3>CDecor Class</h3>
+            <p>The central game engine class — world state, player, objects.</p>
+          </a>
+          <a class="card" href="gameplay.html">
+            <div class="card-icon">🥚</div>
+            <h3>Gameplay</h3>
+            <p>Player movement, vehicles, power-ups, enemies, and level progression.</p>
+          </a>
+          <a class="card" href="assets.html">
+            <div class="card-icon">🖼️</div>
+            <h3>Assets</h3>
+            <p>.blp file format, image channels, level worlds, and sound files.</p>
+          </a>
+          <a class="card" href="platform-support.html">
+            <div class="card-icon">💻</div>
+            <h3>Platform Support</h3>
+            <p>Windows, Linux, macOS, WebAssembly, and Android.</p>
+          </a>
+          <a class="card" href="reverse-engineering.html">
+            <div class="card-icon">🔬</div>
+            <h3>Reverse Engineering</h3>
+            <p>Decompilation methodology, symbol sources, and known artifacts.</p>
+          </a>
+          <a class="card" href="development/known-issues.html">
+            <div class="card-icon">🐛</div>
+            <h3>Known Issues</h3>
+            <p>Bugs, decompilation artifacts, and TODO items from the development checklist.</p>
+          </a>
+          <a class="card" href="faq.html">
+            <div class="card-icon">❓</div>
+            <h3>FAQ</h3>
+            <p>Frequently asked questions about the project.</p>
+          </a>
+        </div>
+
+        <h2 id="current-status">Current Status</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Component</th><th>Status</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>Build system (CMake / FreeDirect)</td><td><span class="badge badge-partial">Partial</span></td><td>Core build works; cleanup TODOs remain</td></tr>
+              <tr><td>Rendering (CPixmap)</td><td><span class="badge badge-partial">Partial</span></td><td>Double-Create() decompilation artifact suspected</td></tr>
+              <tr><td>Player movement (decblupi.cpp)</td><td><span class="badge badge-wip">WIP</span></td><td>Most complex file; physics needs verification</td></tr>
+              <tr><td>Input handling (event.cpp)</td><td><span class="badge badge-wip">WIP</span></td><td>Largest file; phase dispatch incomplete</td></tr>
+              <tr><td>Enemy AI (decmove.cpp)</td><td><span class="badge badge-wip">WIP</span></td><td>Moving objects and AI logic incomplete</td></tr>
+              <tr><td>Audio (DirectSound / BASS)</td><td><span class="badge badge-partial">Partial</span></td><td>_BASS=FALSE default; MCI path active</td></tr>
+              <tr><td>Network (DirectPlay)</td><td><span class="badge badge-broken">Broken</span></td><td>Fails silently; singleplayer fallback works</td></tr>
+              <tr><td>Save/Load (decio.cpp)</td><td><span class="badge badge-wip">WIP</span></td><td>Version compatibility gaps possible</td></tr>
+              <tr><td>Level editor (decdesign.cpp)</td><td><span class="badge badge-wip">WIP</span></td><td>Known missing features</td></tr>
+              <tr><td>Emscripten (Web)</td><td><span class="badge badge-partial">Partial</span></td><td>Builds; IDBFS persistence works</td></tr>
+              <tr><td>Android</td><td><span class="badge badge-partial">Partial</span></td><td>NDK build present; see ANDROID.md</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="platforms">Supported Platforms</h2>
+        <ul>
+          <li><strong>Windows</strong> — Visual Studio 2022 (native DirectX 3) or CMake + FreeDirect</li>
+          <li><strong>Linux / macOS</strong> — CMake + FreeDirect (SDL3-based)</li>
+          <li><strong>Web</strong> — Emscripten WebAssembly build</li>
+          <li><strong>Android</strong> — NDK + Gradle (SDL3 via CMake)</li>
+        </ul>
+
+        <h2 id="license">License</h2>
+        <p>Free Eggbert is released under the <strong>GNU General Public License v3.0</strong> (GPLv3).</p>
+        <p>
+          This project is intended for research, preservation, documentation, and compatibility work.
+          It is not an official release of the original game source code. Game assets (DATA, IMAGE08,
+          IMAGE16, SOUND) are not included and must be obtained from an original copy of Speedy Eggbert 2.
+        </p>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="assets/script.js"></script>
+<script>initPage('index');</script>
+</body>
+</html>

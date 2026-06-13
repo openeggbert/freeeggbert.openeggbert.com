@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuration — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Configuration</span>
+        </nav>
+
+        <h1>Configuration</h1>
+
+        <h2 id="config-file">config.def</h2>
+        <p>
+          The game reads a plain-text configuration file at startup.
+          The path read by <code>ReadConfig()</code> in <code>src/blupi.cpp</code> is
+          <code>data/config.def</code> (relative to the working directory).
+        </p>
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            On case-insensitive filesystems (Windows, macOS), <code>data/config.def</code>
+            and <code>DATA/config.def</code> are the same. On Linux (case-sensitive),
+            the path must match exactly. The game assets live in
+            <code>gamefiles/DATA/</code> — ensure you run the executable from the
+            repository root.
+          </div>
+        </div>
+
+        <h3 id="config-keys">Configuration Keys</h3>
+        <p>Keys are parsed by <code>ReadConfig()</code> in <code>src/blupi.cpp</code>. All keys are optional except under <code>_CD=TRUE</code> builds which require <code>CD-Rom</code>.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Key</th><th>Values / Range</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>FullScreen</code></td><td>0 / 1</td><td>Run in fullscreen (1) or windowed (0)</td></tr>
+              <tr><td><code>TrueColor</code></td><td>8 / 16</td><td>Set both back and decor color depth at once (shorthand)</td></tr>
+              <tr><td><code>TrueColorBack</code></td><td>8 / 16</td><td>Color depth for background images (8=palette, 16=truecolor)</td></tr>
+              <tr><td><code>TrueColorDecor</code></td><td>8 / 16</td><td>Color depth for decor overlay images (overrides TrueColor)</td></tr>
+              <tr><td><code>MouseType</code></td><td>1–9</td><td>Mouse cursor type: 1=MOUSETYPEGRA, 2=MOUSETYPEWIN, 3=MOUSETYPEWINPOS</td></tr>
+              <tr><td><code>SpeedRate</code></td><td>1–2</td><td>Game speed multiplier (1=normal, 2=fast)</td></tr>
+              <tr><td><code>Timer</code></td><td>10–1000</td><td>Timer tick interval in milliseconds (default ~50ms = 20 fps)</td></tr>
+              <tr><td><code>Benchmark</code></td><td>0–100000</td><td>Benchmark score; values above 3099 force TrueColor on</td></tr>
+              <tr><td><code>CDAudio</code></td><td>0 / 1</td><td>Enable CD audio playback (legacy)</td></tr>
+              <tr><td><code>CD-Rom</code></td><td>path string</td><td>CD-ROM drive path (only used when <code>_CD=TRUE</code>)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            The key <code>Speed</code> does <strong>not</strong> exist — the correct key is
+            <code>SpeedRate</code>. Earlier documentation incorrectly listed it as "Speed".
+          </div>
+        </div>
+
+        <h2 id="compile-flags">Compile-Time Configuration</h2>
+        <p>
+          Additional configuration is done at compile time via <code>#define</code> flags
+          in <code>include/def.hpp</code>. These cannot be changed at runtime.
+        </p>
+        <p>See <a href="reference/compile-flags.html">Compile Flags Reference</a> for the full list.</p>
+
+        <h2 id="save-slots">Save Game Slots</h2>
+        <p>
+          The game supports up to <strong>6 save game slots</strong> (<code>MAXSAVE=6</code>).
+          Each slot stores a complete <code>DescSave</code> struct (~56KB) containing the
+          full game state. Save files are stored in <code>gamefiles/DATA/</code>.
+        </p>
+        <p>
+          On the WebAssembly build, save data is stored in the browser's IndexedDB
+          via Emscripten IDBFS, mounted at <code>/save</code>.
+        </p>
+
+        <h2 id="gamer-profiles">Gamer Profiles</h2>
+        <p>
+          The game supports named player profiles (gamers).
+          Up to <code>MAXGAMER=8</code> gamer profiles can be created.
+          Profiles are managed through these game phases:
+        </p>
+        <ul>
+          <li><code>WM_PHASE_GAMER</code> — gamer selection screen</li>
+          <li><code>WM_PHASE_NAMEGAMER</code> — create/name a new gamer</li>
+          <li><code>WM_PHASE_CLEARGAMER</code> — clear/delete a gamer profile</li>
+        </ul>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('configuration');</script>
+</body>
+</html>

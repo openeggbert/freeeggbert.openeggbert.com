@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Known Limitations — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Known Limitations</span>
+        </nav>
+
+        <h1>Known Limitations</h1>
+        <p>
+          This page summarizes the known limitations, bugs, and incomplete features of
+          Free Eggbert as of the current repository state.
+          See also <a href="development/known-issues.html">Development → Known Issues</a>
+          for the detailed technical TODO list.
+        </p>
+
+        <h2 id="gameplay-limitations">Gameplay</h2>
+        <ul>
+          <li>Many movement and physics behaviors in <code>decblupi.cpp</code> need verification against the original game</li>
+          <li>Enemy AI in <code>decmove.cpp</code> is incomplete; some enemies may not behave correctly</li>
+          <li>Block/crate interaction logic in <code>decblock.cpp</code> has known issues</li>
+          <li>The level editor (<code>decdesign.cpp</code>) has missing features</li>
+          <li>Save/load (<code>decio.cpp</code>) may have version compatibility gaps</li>
+        </ul>
+
+        <h2 id="rendering-limitations">Rendering</h2>
+        <ul>
+          <li><strong>Double <code>CPixmap::Create()</code> call</strong> — may cause initialization failures with real DirectDraw</li>
+          <li><strong>Parameter swap</strong> — <code>bTrueColorBack</code> / <code>bTrueColorDecor</code> are swapped in the CPixmap::Create() signature</li>
+          <li><strong>Unsafe <code>delete this</code></strong> in <code>CacheAll(FALSE)</code> code path — undefined behavior</li>
+          <li>Suspicious rectangle initialization in <code>CacheAll(TRUE)</code></li>
+        </ul>
+
+        <h2 id="network-limitations">Network / Multiplayer</h2>
+        <div class="callout danger">
+          <span class="callout-icon">⛔</span>
+          <div class="callout-body">
+            <div class="callout-title">Multiplayer Broken</div>
+            Network initialization via DirectPlay fails silently.
+            <code>CNetwork::CreateProvider(0)</code> returns <code>FALSE</code> immediately
+            because no providers have been enumerated. The game falls back to single-player.
+          </div>
+        </div>
+        <ul>
+          <li><code>CNetwork::Receive()</code> may not correctly copy received data into the caller buffer</li>
+          <li>DirectPlay session lifecycle phases are incomplete</li>
+        </ul>
+
+        <h2 id="audio-limitations">Audio</h2>
+        <ul>
+          <li>README mentions BASS/BASSMIDI but default is DirectSound/MCI (<code>_BASS=FALSE</code>)</li>
+          <li>Audio backend documentation may be outdated</li>
+        </ul>
+
+        <h2 id="platform-limitations">Platform</h2>
+        <ul>
+          <li>macOS support needs verification</li>
+          <li>Web (Emscripten) build has limited testing; main loop adaptation may be incomplete</li>
+          <li>Android build is functional but not fully polished</li>
+          <li>Native DirectX 3 path may fail due to decompilation artifacts that FreeDirect tolerates</li>
+        </ul>
+
+        <h2 id="build-limitations">Build System</h2>
+        <ul>
+          <li><code>target_include_directories</code> for <code>SPEEDY_BLUPI_WINDOWS</code> uses <code>PUBLIC</code> where <code>PRIVATE</code> would be correct</li>
+          <li>Whether <code>/permissive-</code> is appropriate for MSVC with decompiled code needs verification</li>
+          <li>SDL runtime copying on Windows needs DLL target verification</li>
+        </ul>
+
+        <h2 id="missing-docs">Missing Documentation</h2>
+        <ul>
+          <li>No Doxygen documentation on headers or source files</li>
+          <li><code>.blp</code> binary file format is not fully specified</li>
+          <li>Visual region themes for each <code>decor000–031.blp</code> are not documented</li>
+        </ul>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('known-limitations');</script>
+</body>
+</html>

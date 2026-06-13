@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sound Effects — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Reference</a>
+          <span class="sep">/</span>
+          <span class="current">Sound Effects</span>
+        </nav>
+
+        <h1>Sound Effects (SOUND_*)</h1>
+        <p>
+          93 sound effects (indices 0–92) plus a special movie sound marker (99).
+          Defined in <code>include/def.hpp</code>. Asset files are in <code>gamefiles/SOUND/</code>.
+          File names use uppercase for indices 0–65 (<code>SOUND000.BLP</code>–<code>SOUND065.BLP</code>)
+          and lowercase for indices 66–92 (<code>sound066.blp</code>–<code>sound092.blp</code>).
+          Music tracks are <code>MUSIC000.BLP</code>–<code>MUSIC009.BLP</code> (10 tracks).
+        </p>
+
+        <h2 id="ui">UI and Menu</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_CLICK</code></td><td>0</td><td>Button click</td></tr>
+          <tr><td><code>SOUND_ERROR</code></td><td>27</td><td>Error / invalid action</td></tr>
+        </tbody></table></div>
+
+        <h2 id="movement">Movement</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_JUMP0</code></td><td>22</td><td>Low jump</td></tr>
+          <tr><td><code>SOUND_JUMP1</code></td><td>1</td><td>Medium jump</td></tr>
+          <tr><td><code>SOUND_JUMP2</code></td><td>2</td><td>High jump</td></tr>
+          <tr><td><code>SOUND_JUMPEND</code></td><td>3</td><td>Land on stone</td></tr>
+          <tr><td><code>SOUND_JUMPTOC</code></td><td>4</td><td>Hit stone (footstep)</td></tr>
+          <tr><td><code>SOUND_TURN</code></td><td>5</td><td>Turn around</td></tr>
+          <tr><td><code>SOUND_FALL</code></td><td>8</td><td>Falling</td></tr>
+          <tr><td><code>SOUND_NEW</code></td><td>9</td><td>Respawn</td></tr>
+          <tr><td><code>SOUND_UP</code></td><td>20</td><td>Partially unused (L+R+Down press)</td></tr>
+          <tr><td><code>SOUND_LOOKUP</code></td><td>21</td><td>Looking up</td></tr>
+        </tbody></table></div>
+
+        <h2 id="footsteps">Footstep Variants (Surface Type)</h2>
+        <div class="table-wrap"><table><thead><tr><th>Surface</th><th>JUMPEND</th><th>Value</th><th>JUMPTOC</th><th>Value</th></tr></thead><tbody>
+          <tr><td>Wood</td><td><code>SOUND_JUMPENDb</code></td><td>78</td><td><code>SOUND_JUMPTOCb</code></td><td>79</td></tr>
+          <tr><td>Metal</td><td><code>SOUND_JUMPENDm</code></td><td>80</td><td><code>SOUND_JUMPTOCm</code></td><td>81</td></tr>
+          <tr><td>Cave</td><td><code>SOUND_JUMPENDg</code></td><td>82</td><td><code>SOUND_JUMPTOCg</code></td><td>83</td></tr>
+          <tr><td>Slime</td><td><code>SOUND_JUMPENDo</code></td><td>84</td><td><code>SOUND_JUMPTOCo</code></td><td>85</td></tr>
+          <tr><td>Plastic</td><td><code>SOUND_JUMPENDk</code></td><td>86</td><td><code>SOUND_JUMPTOCk</code></td><td>87</td></tr>
+          <tr><td>Cheese</td><td><code>SOUND_JUMPENDf</code></td><td>88</td><td><code>SOUND_JUMPTOCf</code></td><td>89</td></tr>
+          <tr><td>Grass</td><td><code>SOUND_JUMPENDh</code></td><td>90</td><td><code>SOUND_JUMPTOCh</code></td><td>91</td></tr>
+        </tbody></table></div>
+
+        <h2 id="character">Character Reactions</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_VERTIGO</code></td><td>6</td><td>Vertigo "whoops" (edge)</td></tr>
+          <tr><td><code>SOUND_DOWN</code></td><td>7</td><td>Look down</td></tr>
+          <tr><td><code>SOUND_BYE</code></td><td>32</td><td>"au au" farewell</td></tr>
+          <tr><td><code>SOUND_JUMPAIE</code></td><td>40</td><td>Headache "aie!"</td></tr>
+          <tr><td><code>SOUND_OUF1</code></td><td>46</td><td>Exit water "phew"</td></tr>
+          <tr><td><code>SOUND_OUF2</code></td><td>47</td><td>Scared "huaaaahhhhh!"</td></tr>
+          <tr><td><code>SOUND_OUF3</code></td><td>48</td><td>Stop moving crate "gahh!"</td></tr>
+          <tr><td><code>SOUND_OUF4</code></td><td>49</td><td>Shriek / heartbeat</td></tr>
+          <tr><td><code>SOUND_MOCKERY</code></td><td>65</td><td>Mockery taunt</td></tr>
+          <tr><td><code>SOUND_PATIENT</code></td><td>37</td><td>Patience expression</td></tr>
+        </tbody></table></div>
+
+        <h2 id="helicopter">Helicopter</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_HELICOSTART</code></td><td>15</td><td>Helicopter starting</td></tr>
+          <tr><td><code>SOUND_HELICOHIGH</code></td><td>16</td><td>Helicopter in flight (high RPM)</td></tr>
+          <tr><td><code>SOUND_HELICOSTOP</code></td><td>17</td><td>Helicopter stopping</td></tr>
+          <tr><td><code>SOUND_HELICOLOW</code></td><td>18</td><td>Helicopter low speed</td></tr>
+        </tbody></table></div>
+
+        <h2 id="jeep">Jeep</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_JEEPSTART</code></td><td>28</td><td>Jeep starting</td></tr>
+          <tr><td><code>SOUND_JEEPHIGH</code></td><td>29</td><td>Jeep at speed</td></tr>
+          <tr><td><code>SOUND_JEEPSTOP</code></td><td>30</td><td>Jeep stopping</td></tr>
+          <tr><td><code>SOUND_JEEPLOW</code></td><td>31</td><td>Jeep slow</td></tr>
+        </tbody></table></div>
+
+        <h2 id="water">Water</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_PLOUF</code></td><td>23</td><td>Big water splash</td></tr>
+          <tr><td><code>SOUND_BLUP</code></td><td>24</td><td>Underwater bubble</td></tr>
+          <tr><td><code>SOUND_SURF</code></td><td>25</td><td>Inhale at surface</td></tr>
+          <tr><td><code>SOUND_DROWN</code></td><td>26</td><td>Drowning</td></tr>
+          <tr><td><code>SOUND_TIPLOUF</code></td><td>64</td><td>Small water splash</td></tr>
+        </tbody></table></div>
+
+        <h2 id="crate-bars">Crate and Bar Interactions</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_PUSH</code></td><td>38</td><td>Pushing crate</td></tr>
+          <tr><td><code>SOUND_POP</code></td><td>39</td><td>Pulling crate</td></tr>
+          <tr><td><code>SOUND_RESSORT</code></td><td>41</td><td>Spring bounce</td></tr>
+          <tr><td><code>SOUND_SUSPENDTOC</code></td><td>34</td><td>Grab bar</td></tr>
+          <tr><td><code>SOUND_SUSPENDJUMP</code></td><td>35</td><td>Pull up from bar</td></tr>
+          <tr><td><code>SOUND_SINGE</code></td><td>36</td><td>Singed</td></tr>
+        </tbody></table></div>
+
+        <h2 id="power-ups">Power-ups</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_STARTSHIELD</code></td><td>42</td><td>Shield activates</td></tr>
+          <tr><td><code>SOUND_STOPSHIELD</code></td><td>43</td><td>Shield deactivates</td></tr>
+          <tr><td><code>SOUND_STARTPOWER</code></td><td>44</td><td>Lollipop activates</td></tr>
+          <tr><td><code>SOUND_STOPPOWER</code></td><td>45</td><td>Lollipop deactivates</td></tr>
+          <tr><td><code>SOUND_SUCETTE</code></td><td>50</td><td>Lollipop lick sound</td></tr>
+          <tr><td><code>SOUND_STARTHIDE</code></td><td>62</td><td>Cloud invisibility starts</td></tr>
+          <tr><td><code>SOUND_STARTCLOUD</code></td><td>55</td><td>Cloud begins</td></tr>
+          <tr><td><code>SOUND_STOPCLOUD</code></td><td>56</td><td>Cloud ends</td></tr>
+          <tr><td><code>SOUND_DRINK</code></td><td>57</td><td>Drinking</td></tr>
+          <tr><td><code>SOUND_CHARGE</code></td><td>58</td><td>Charging up</td></tr>
+          <tr><td><code>SOUND_ELECTRO</code></td><td>59</td><td>Electrocution</td></tr>
+        </tbody></table></div>
+
+        <h2 id="combat">Combat and Bombs</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_BOUM</code></td><td>10</td><td>Explosion</td></tr>
+          <tr><td><code>SOUND_FIREOK</code></td><td>52</td><td>Tank fire successful</td></tr>
+          <tr><td><code>SOUND_FIREKO</code></td><td>53</td><td>Tank fire failed (ratchet)</td></tr>
+          <tr><td><code>SOUND_GLU</code></td><td>51</td><td>Glued sound</td></tr>
+          <tr><td><code>SOUND_TAKEGLU</code></td><td>54</td><td>Picking up glue</td></tr>
+          <tr><td><code>SOUND_BLITZ</code></td><td>69</td><td>Lightning buzz</td></tr>
+          <tr><td><code>SOUND_ECRASE</code></td><td>70</td><td>Squished</td></tr>
+        </tbody></table></div>
+
+        <h2 id="collectibles">Collectibles and Goals</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_TRESOR</code></td><td>11</td><td>Treasure collected</td></tr>
+          <tr><td><code>SOUND_EGG</code></td><td>12</td><td>Egg collected</td></tr>
+          <tr><td><code>SOUND_LASTTRESOR</code></td><td>19</td><td>Last treasure collected</td></tr>
+          <tr><td><code>SOUND_ENDKO</code></td><td>13</td><td>Level lost</td></tr>
+          <tr><td><code>SOUND_ENDOK</code></td><td>14</td><td>Level won</td></tr>
+          <tr><td><code>SOUND_ANGEL</code></td><td>74</td><td>Angel sound "uie uie"</td></tr>
+        </tbody></table></div>
+
+        <h2 id="mechanics">Doors, Keys and Level Mechanics</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_DOOR</code></td><td>33</td><td>Door creak</td></tr>
+          <tr><td><code>SOUND_TELEPORTE</code></td><td>71</td><td>Teleport</td></tr>
+          <tr><td><code>SOUND_BRIDGE1</code></td><td>72</td><td>Bridge falling</td></tr>
+          <tr><td><code>SOUND_BRIDGE2</code></td><td>73</td><td>Bridge reappearing</td></tr>
+          <tr><td><code>SOUND_SCIE</code></td><td>75</td><td>Saw cutting</td></tr>
+          <tr><td><code>SOUND_SWITCHOFF</code></td><td>76</td><td>Switch turned off</td></tr>
+          <tr><td><code>SOUND_SWITCHON</code></td><td>77</td><td>Switch turned on</td></tr>
+        </tbody></table></div>
+
+        <h2 id="multiplayer">Multiplayer Personal Bombs</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_PERSOTAKE</code></td><td>60</td><td>Picking up personal bomb ("wow!")</td></tr>
+          <tr><td><code>SOUND_PERSOPOSE</code></td><td>61</td><td>Placing personal bomb (evil laugh)</td></tr>
+        </tbody></table></div>
+
+        <h2 id="inversion">Inversion</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_INVERTSTART</code></td><td>66</td><td>Controls inversion begins</td></tr>
+          <tr><td><code>SOUND_INVERTSTOP</code></td><td>67</td><td>Controls inversion ends</td></tr>
+        </tbody></table></div>
+
+        <h2 id="misc">Hovercraft and Misc</h2>
+        <div class="table-wrap"><table><thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead><tbody>
+          <tr><td><code>SOUND_OVERSTOP</code></td><td>68</td><td>Hovercraft stall</td></tr>
+          <tr><td><code>SOUND_FOLLOW</code></td><td>92</td><td>Homing bomb "be-be-beep"</td></tr>
+          <tr><td><code>SOUND_MOVIE</code></td><td>99</td><td>Movie/cutscene marker (not a real sample)</td></tr>
+        </tbody></table></div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="object-types.html">← <span class="pnl-label">Object Types</span></a>
+          <a class="page-nav-link next" href="game-phases.html"><span class="pnl-label">Game Phases</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('sound-effects');</script>
+</body>
+</html>

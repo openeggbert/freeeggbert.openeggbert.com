@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controls — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="gameplay.html">Gameplay</a>
+          <span class="sep">/</span>
+          <span class="current">Controls</span>
+        </nav>
+
+        <h1>Controls</h1>
+
+        <div class="callout verify">
+          <span class="callout-icon">🔍</span>
+          <div class="callout-body">
+            <div class="callout-title">Needs Verification</div>
+            The exact key bindings are derived from code analysis. The original game
+            likely supported configuration via <code>gamefiles/DATA/config.def</code>.
+            Some controls may not yet work correctly in the current build.
+          </div>
+        </div>
+
+        <h2 id="keyboard">Keyboard Input Flags</h2>
+        <p>
+          Input is tracked as a bitmask of pressed keys in <code>include/def.hpp</code>.
+          These constants are used throughout <code>src/event.cpp</code> and
+          <code>src/decblupi.cpp</code>.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>KEY_NONE</code></td><td>0</td><td>No key pressed</td></tr>
+              <tr><td><code>KEY_LEFT</code></td><td>1</td><td>Move left</td></tr>
+              <tr><td><code>KEY_RIGHT</code></td><td>2</td><td>Move right</td></tr>
+              <tr><td><code>KEY_UP</code></td><td>4</td><td>Look/move up</td></tr>
+              <tr><td><code>KEY_DOWN</code></td><td>8</td><td>Look/move down</td></tr>
+              <tr><td><code>KEY_JUMP</code></td><td>16</td><td>Jump</td></tr>
+              <tr><td><code>KEY_FIRE</code></td><td>32</td><td>Fire / action (tank fire, place bomb)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="basic-controls">Basic Controls</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Action</th><th>Keys</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>Move left</td><td>Left Arrow</td><td></td></tr>
+              <tr><td>Move right</td><td>Right Arrow</td><td></td></tr>
+              <tr><td>Jump</td><td>Space / Up Arrow</td><td>Different jump heights possible</td></tr>
+              <tr><td>Look up</td><td>Up Arrow (while still)</td><td><code>ACTION_UP</code></td></tr>
+              <tr><td>Look down</td><td>Down Arrow (while still)</td><td><code>ACTION_DOWN</code></td></tr>
+              <tr><td>Fire / Action</td><td>Ctrl / Fire button</td><td>Used for tank fire, placing bombs</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="vehicle-controls">Vehicle Controls</h2>
+        <p>When Blupi is in a vehicle, the same keys control vehicle movement:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Vehicle</th><th>Movement</th><th>Special Action</th></tr></thead>
+            <tbody>
+              <tr><td>Helicopter</td><td>Arrow keys (fly)</td><td>Fire button — exit helicopter</td></tr>
+              <tr><td>Jeep</td><td>Left/Right (drive)</td><td>—</td></tr>
+              <tr><td>Tank</td><td>Left/Right (drive)</td><td>Fire — shoot bullet</td></tr>
+              <tr><td>Hovercraft</td><td>Left/Right (move)</td><td>Flies at fixed height</td></tr>
+              <tr><td>Skateboard</td><td>Left/Right (skate)</td><td>Jump — jump while skating</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="interaction-controls">Interaction Controls</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Action</th><th>Keys</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>Push crate</td><td>Walk into crate</td><td><code>ACTION_PUSH</code></td></tr>
+              <tr><td>Pull crate</td><td>Walk while facing crate</td><td><code>ACTION_POP</code></td></tr>
+              <tr><td>Grab bar (hang)</td><td>Jump into bars overhead</td><td><code>ACTION_STOPSUSPEND</code></td></tr>
+              <tr><td>Move on bars</td><td>Left/Right while hanging</td><td><code>ACTION_MARCHSUSPEND</code></td></tr>
+              <tr><td>Pull up from bars</td><td>Up Arrow while hanging</td><td><code>ACTION_JUMPSUSPEND</code></td></tr>
+              <tr><td>Place dynamite</td><td>Fire button (if carrying)</td><td><code>ACTION_PUTDYNAMITE</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="control-inversion">Control Inversion</h2>
+        <p>
+          Some level hazards invert the player's controls.
+          When active, <code>blupiInvert=TRUE</code> in the game state and
+          left/right inputs are swapped. The inversion triggers game objects
+          of type <code>TYPE_INVERT</code>, <code>TYPE_INVERTSTART</code>, and
+          <code>TYPE_INVERTSTOP</code>.
+        </p>
+
+        <h2 id="input-implementation">Input Implementation</h2>
+        <p>
+          Input is processed in <code>src/event.cpp</code> by the <code>CEvent</code> class.
+          Key state is stored as a bitmask and fed to <code>CDecor::SetInput(int keys)</code>
+          each game tick. Player movement logic then reads from this in <code>src/decblupi.cpp</code>.
+        </p>
+        <p>
+          On the Emscripten (Web) build, keyboard events are translated to the same bitmask format.
+          On Android, touch coordinates are mapped through SDL3's logical presentation layer to
+          game coordinates.
+        </p>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="gameplay.html">← <span class="pnl-label">Gameplay Overview</span></a>
+          <a class="page-nav-link next" href="assets.html"><span class="pnl-label">Assets &amp; Files</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('controls');</script>
+</body>
+</html>

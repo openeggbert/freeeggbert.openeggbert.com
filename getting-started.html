@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Getting Started</span>
+        </nav>
+
+        <h1>Getting Started</h1>
+        <p>This guide walks you through cloning, building, and running Free Eggbert for the first time.</p>
+
+        <h2 id="prerequisites">Prerequisites</h2>
+        <p>To build Free Eggbert using the recommended CMake + FreeDirect path, you need:</p>
+        <ul>
+          <li><strong>Git</strong> — with submodule support</li>
+          <li><strong>CMake 3.20+</strong></li>
+          <li><strong>A C++20 compiler</strong> — GCC 11+, Clang 12+, or MSVC v143</li>
+          <li><strong>A C++ build environment</strong> — make/ninja on Linux/macOS, or MSBuild on Windows</li>
+          <li><strong>Game asset files</strong> — DATA, IMAGE08, IMAGE16, SOUND directories from an original copy of Speedy Eggbert 2</li>
+        </ul>
+
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            <div class="callout-title">No System SDL Required</div>
+            By default, CMake builds vendored SDL3, SDL_image, and SDL_mixer from git submodules.
+            You do not need to install SDL packages from your system package manager.
+          </div>
+        </div>
+
+        <h2 id="step1-clone">Step 1: Clone the Repository</h2>
+        <pre><code><span class="cmt"># Clone the repository</span>
+git clone &lt;repository-url&gt; free-eggbert
+cd free-eggbert
+
+<span class="cmt"># Initialize all submodules (SDL3, SDL_image, SDL_mixer, dxsdk3)</span>
+git submodule update --init --recursive</code></pre>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Submodules Required</div>
+            The <code>third_party/SDL</code>, <code>third_party/SDL_image</code>, and
+            <code>third_party/SDL_mixer</code> submodules must be initialized before building.
+            Without them, CMake configuration will fail.
+          </div>
+        </div>
+
+        <h2 id="step2-assets">Step 2: Add Game Assets</h2>
+        <p>
+          Free Eggbert requires the original game asset files. These are <strong>not included</strong>
+          in the repository. Obtain them from a legal copy of Speedy Eggbert 2 and place them under
+          <code>gamefiles/</code>:
+        </p>
+        <div class="file-tree">
+<span class="dir">free-eggbert/gamefiles/</span>
+├── <span class="dir">DATA/</span>          <span class="note">~110 .blp world/demo/config files</span>
+├── <span class="dir">IMAGE08/</span>       <span class="note">~68 8-bit palette image files</span>
+├── <span class="dir">IMAGE16/</span>       <span class="note">~55 16-bit true-color image files</span>
+└── <span class="dir">SOUND/</span>         <span class="note">~103 music and SFX files</span>
+        </div>
+        <p>See <a href="assets.html">Assets &amp; Files</a> for the full directory contents.</p>
+
+        <h2 id="step3-build">Step 3: Build</h2>
+        <pre><code><span class="cmt"># Configure (using FreeDirect / SDL3 backend)</span>
+cmake -S . -B build -DSPEEDY_BLUPI_BACKEND=FREEDIRECT
+
+<span class="cmt"># Build (using all available CPU cores)</span>
+cmake --build build -j</code></pre>
+
+        <p>The compiled executable will be at <code>build/bin/SPEEDY_BLUPI_WINDOWS</code>
+          (or <code>SPEEDY_BLUPI_WINDOWS.exe</code> on Windows).</p>
+
+        <h2 id="step4-run">Step 4: Run</h2>
+        <pre><code><span class="cmt"># Run from the project root (so relative paths to gamefiles/ work)</span>
+./build/bin/SPEEDY_BLUPI_WINDOWS</code></pre>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Working Directory</div>
+            The game reads assets using relative paths like <code>gamefiles/DATA/config.def</code>.
+            Run the executable from the root of the repository, not from inside the build directory.
+          </div>
+        </div>
+
+        <h2 id="clean-rebuild">Clean Rebuild</h2>
+        <p>If you have build problems or a stale CMake cache, perform a clean rebuild:</p>
+        <pre><code>rm -rf build
+git submodule update --init --recursive
+cmake -S . -B build -DSPEEDY_BLUPI_BACKEND=FREEDIRECT
+cmake --build build -j</code></pre>
+
+        <h2 id="other-platforms">Other Platforms</h2>
+        <p>
+          For platform-specific instructions, see the dedicated build documentation:
+        </p>
+        <ul>
+          <li><a href="build.html#visual-studio">Windows (Visual Studio 2022)</a></li>
+          <li><a href="build.html#emscripten">WebAssembly (Emscripten)</a></li>
+          <li><a href="platform-support.html#android">Android</a></li>
+        </ul>
+
+        <h2 id="next-steps">Next Steps</h2>
+        <ul>
+          <li><a href="build.html">Full Build System Documentation</a> — all build options and flags</li>
+          <li><a href="running.html">Running the Game</a> — configuration, command-line options</li>
+          <li><a href="architecture.html">Architecture Overview</a> — understand the codebase</li>
+          <li><a href="project-structure.html">Project Structure</a> — directory and file layout</li>
+        </ul>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="overview.html">← <span class="pnl-label">Project Overview</span></a>
+          <a class="page-nav-link next" href="build.html"><span class="pnl-label">Build &amp; Compile</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('getting-started');</script>
+</body>
+</html>

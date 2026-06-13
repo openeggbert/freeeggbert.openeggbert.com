@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Structures — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Reference</a>
+          <span class="sep">/</span>
+          <span class="current">Data Structures</span>
+        </nav>
+
+        <h1>Data Structures</h1>
+        <p>
+          Key data structures defined in <code>include/decor.hpp</code>.
+          These are the primary data containers for world state, level files, network packets, and save games.
+        </p>
+
+        <h2 id="cellule">Cellule</h2>
+        <p>A single world grid cell. The world is a 100×100 grid of these.</p>
+        <pre><code><span class="kw">typedef struct</span> {
+    <span class="kw2">short</span> icon;  <span class="cmt">// sprite index into the background/decor sheet</span>
+} Cellule;</code></pre>
+        <p>
+          Used in <code>DescSave::decor[100][100]</code> and
+          <code>DescSave::bigDecor[100][100]</code> as raw <code>short</code> values.
+        </p>
+
+        <h2 id="moveobject">MoveObject</h2>
+        <p>
+          Tracks one of up to 200 (<code>MAXMOVEOBJECT</code>) simultaneously active
+          moving game objects: enemies, bombs, vehicles, collectibles, and visual effects.
+          Managed by <code>CDecor</code> in <code>src/decmove.cpp</code>.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>type</code></td><td>short</td><td>Object type (<code>TYPE_*</code> constant)</td></tr>
+              <tr><td><code>stepAdvance</code></td><td>short</td><td>Steps taken when advancing (moving toward end)</td></tr>
+              <tr><td><code>stepRecede</code></td><td>short</td><td>Steps taken when receding (moving toward start)</td></tr>
+              <tr><td><code>timeStopStart</code></td><td>short</td><td>Time spent stopped at start position</td></tr>
+              <tr><td><code>timeStopEnd</code></td><td>short</td><td>Time spent stopped at end position</td></tr>
+              <tr><td><code>unknown1</code></td><td>short</td><td>Unknown field (decompilation artifact)</td></tr>
+              <tr><td><code>posStart</code></td><td>POINT</td><td>Starting position (world coordinates)</td></tr>
+              <tr><td><code>posEnd</code></td><td>POINT</td><td>Target/end position</td></tr>
+              <tr><td><code>posCurrent</code></td><td>POINT</td><td>Current interpolated position</td></tr>
+              <tr><td><code>step</code></td><td>short</td><td>Current animation step index</td></tr>
+              <tr><td><code>time</code></td><td>short</td><td>Timer for current motion/dwell phase</td></tr>
+              <tr><td><code>phase</code></td><td>short</td><td>Current motion phase (advance, stop, recede)</td></tr>
+              <tr><td><code>channel</code></td><td>short</td><td>Sprite render channel (<code>CH*</code>)</td></tr>
+              <tr><td><code>icon</code></td><td>short</td><td>Sprite icon index within the channel spritesheet</td></tr>
+              <tr><td><code>unknown2</code></td><td>short</td><td>Unknown field (decompilation artifact)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="descfile">DescFile</h2>
+        <p>
+          Level file header, stored at the beginning of each <code>worldNNN.blp</code> file.
+          Contains per-level settings that do not change during gameplay.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>majRev</code></td><td>short</td><td>File format major revision</td></tr>
+              <tr><td><code>minRev</code></td><td>short</td><td>File format minor revision</td></tr>
+              <tr><td><code>posDecor</code></td><td>POINT</td><td>Initial camera/scroll position</td></tr>
+              <tr><td><code>dimDecor</code></td><td>POINT</td><td>World dimensions (usually 100×100)</td></tr>
+              <tr><td><code>world</code></td><td>short</td><td>World/chapter number</td></tr>
+              <tr><td><code>music</code></td><td>short</td><td>Background music track (0–9)</td></tr>
+              <tr><td><code>region</code></td><td>short</td><td>Visual region/theme (selects decor spritesheet 0–31)</td></tr>
+              <tr><td><code>blupiPos[4]</code></td><td>POINT[4]</td><td>Player start positions (up to 4 players)</td></tr>
+              <tr><td><code>blupiDir[4]</code></td><td>int[4]</td><td>Player start facing directions</td></tr>
+              <tr><td><code>name[100]</code></td><td>char[100]</td><td>Level name string (null-terminated)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="descsave">DescSave</h2>
+        <p>
+          Complete serialized game state (~56KB). Written to save game slots by
+          <code>src/decio.cpp</code>. Also called <code>DescLevel</code> in some older references.
+        </p>
+        <h3>Format Header</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>lg</code></td><td>int</td><td>Total struct size in bytes</td></tr>
+              <tr><td><code>majRev</code></td><td>int</td><td>Save format major revision</td></tr>
+              <tr><td><code>minRev</code></td><td>int</td><td>Save format minor revision</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>World Grid</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>decor[100][100]</code></td><td>short</td><td>Main terrain grid (icon indices)</td></tr>
+              <tr><td><code>bigDecor[100][100]</code></td><td>short</td><td>Background decor layer (icon indices)</td></tr>
+              <tr><td><code>balleTraj[100][13]</code></td><td>char</td><td>Glue ball trajectory data</td></tr>
+              <tr><td><code>moveTraj[100][13]</code></td><td>char</td><td>Moving object trajectory data</td></tr>
+              <tr><td><code>moveObject[200]</code></td><td>MoveObject</td><td>All active moving objects</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>World State</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>posDecor</code></td><td>POINT</td><td>Current camera position</td></tr>
+              <tr><td><code>dimDecor</code></td><td>POINT</td><td>World dimensions</td></tr>
+              <tr><td><code>phase</code></td><td>int</td><td>Current game phase</td></tr>
+              <tr><td><code>term</code></td><td>int</td><td>Terminal/end-of-level flag</td></tr>
+              <tr><td><code>music</code></td><td>int</td><td>Current music track index</td></tr>
+              <tr><td><code>region</code></td><td>int</td><td>Current visual region</td></tr>
+              <tr><td><code>time</code></td><td>int</td><td>Game timer</td></tr>
+              <tr><td><code>missionTitle[100]</code></td><td>char</td><td>Current mission/level name</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Crate Management</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>nbRankCaisse</code></td><td>int</td><td>Number of ranked crate entries</td></tr>
+              <tr><td><code>rankCaisse[200]</code></td><td>int[200]</td><td>Crate ordering/ranking array</td></tr>
+              <tr><td><code>nbLinkCaisse</code></td><td>int</td><td>Number of crate links</td></tr>
+              <tr><td><code>linkCaisse[200]</code></td><td>int[200]</td><td>Crate link targets array</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Player Position and Motion</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>blupiPos</code></td><td>POINT</td><td>Current player position in world pixels</td></tr>
+              <tr><td><code>blupiValidPos</code></td><td>POINT</td><td>Last known safe/valid position</td></tr>
+              <tr><td><code>blupiAction</code></td><td>int</td><td>Current animation/action code (<code>ACTION_*</code>)</td></tr>
+              <tr><td><code>blupiDir</code></td><td>int</td><td>Facing direction</td></tr>
+              <tr><td><code>blupiPhase</code></td><td>int</td><td>Current animation frame phase</td></tr>
+              <tr><td><code>blupiVitesse</code></td><td>POINT</td><td>Current velocity (pixels per tick)</td></tr>
+              <tr><td><code>blupiIcon</code></td><td>int</td><td>Current primary sprite icon index</td></tr>
+              <tr><td><code>blupiSec</code></td><td>int</td><td>Secondary sprite icon index (shield, power-up overlay)</td></tr>
+              <tr><td><code>blupiChannel</code></td><td>int</td><td>Current sprite channel (<code>CH*</code>)</td></tr>
+              <tr><td><code>blupiVector</code></td><td>POINT</td><td>Movement vector for current action</td></tr>
+              <tr><td><code>blupiTransport</code></td><td>int</td><td>Vehicle mode: 0=none, 1=helicopter, 2=jeep, 3=tank</td></tr>
+              <tr><td><code>blupiStartPos[4]</code></td><td>POINT[4]</td><td>Respawn positions for up to 4 players</td></tr>
+              <tr><td><code>blupiStartDir[4]</code></td><td>int[4]</td><td>Respawn facing directions</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Player State Flags</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>blupiFocus</code></td><td>BOOL</td><td>Player has input focus (accepts damage)</td></tr>
+              <tr><td><code>blupiAir</code></td><td>BOOL</td><td>Player is airborne</td></tr>
+              <tr><td><code>blupiHelico</code></td><td>BOOL</td><td>In helicopter</td></tr>
+              <tr><td><code>blupiOver</code></td><td>BOOL</td><td>In hovercraft</td></tr>
+              <tr><td><code>blupiJeep</code></td><td>BOOL</td><td>In jeep</td></tr>
+              <tr><td><code>blupiTank</code></td><td>BOOL</td><td>In tank</td></tr>
+              <tr><td><code>blupiSkate</code></td><td>BOOL</td><td>On skateboard</td></tr>
+              <tr><td><code>blupiNage</code></td><td>BOOL</td><td>Swimming in deep water</td></tr>
+              <tr><td><code>blupiSurf</code></td><td>BOOL</td><td>Swimming at water surface</td></tr>
+              <tr><td><code>blupiVent</code></td><td>BOOL</td><td>Being blown by wind</td></tr>
+              <tr><td><code>blupiSuspend</code></td><td>BOOL</td><td>Hanging from bar</td></tr>
+              <tr><td><code>blupiJumpAie</code></td><td>BOOL</td><td>Jump-hurt state active</td></tr>
+              <tr><td><code>blupiShield</code></td><td>BOOL</td><td>Shield power-up active</td></tr>
+              <tr><td><code>blupiPower</code></td><td>BOOL</td><td>Lollipop power active</td></tr>
+              <tr><td><code>blupiCloud</code></td><td>BOOL</td><td>Cloud invisibility active</td></tr>
+              <tr><td><code>blupiHide</code></td><td>BOOL</td><td>Hidden state active</td></tr>
+              <tr><td><code>blupiInvert</code></td><td>BOOL</td><td>Controls inverted</td></tr>
+              <tr><td><code>blupiBalloon</code></td><td>BOOL</td><td>In balloon</td></tr>
+              <tr><td><code>blupiEcrase</code></td><td>BOOL</td><td>Being crushed</td></tr>
+              <tr><td><code>blupiRestart</code></td><td>BOOL</td><td>Restart pending</td></tr>
+              <tr><td><code>blupiFront</code></td><td>BOOL</td><td>Player rendered in front of objects</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Player Inventory and Timers</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>blupiBullet</code></td><td>int</td><td>Glue shots remaining (BIRDLIME cheat gives 10)</td></tr>
+              <tr><td><code>blupiCle</code></td><td>int</td><td>Key bitmask: bit 0=red, bit 1=green, bit 2=blue (<code>CLE_*</code> flags)</td></tr>
+              <tr><td><code>blupiPerso</code></td><td>int</td><td>Personal bombs remaining (TENBOMBS cheat gives 10)</td></tr>
+              <tr><td><code>blupiDynamite</code></td><td>int</td><td>Dynamite sticks carried</td></tr>
+              <tr><td><code>blupiNoBarre</code></td><td>int</td><td>Bar-hanging timer</td></tr>
+              <tr><td><code>blupiTimeShield</code></td><td>int</td><td>Shield remaining ticks (ROUNDSHIELD gives 100)</td></tr>
+              <tr><td><code>blupiTimeFire</code></td><td>int</td><td>Fire attack cooldown timer</td></tr>
+              <tr><td><code>blupiTimeNoAsc</code></td><td>int</td><td>Elevator-skip timer</td></tr>
+              <tr><td><code>blupiTimeOuf</code></td><td>int</td><td>Ouf reaction timer</td></tr>
+              <tr><td><code>blupiActionOuf</code></td><td>int</td><td>Ouf reaction action</td></tr>
+              <tr><td><code>blupiFifoNb</code></td><td>int</td><td>FIFO position queue size</td></tr>
+              <tr><td><code>blupiFifoPos[10]</code></td><td>POINT[10]</td><td>FIFO position queue (path following)</td></tr>
+              <tr><td><code>blupiPosHelico</code></td><td>POINT</td><td>Helicopter position (for vehicle camera tracking)</td></tr>
+              <tr><td><code>blupiPosMagic</code></td><td>POINT</td><td>Magic/shield effect origin position</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Vehicle State</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>bHelicoMarch</code></td><td>BOOL</td><td>Helicopter is moving</td></tr>
+              <tr><td><code>bHelicoStop</code></td><td>BOOL</td><td>Helicopter is stopped/hovering</td></tr>
+              <tr><td><code>bJeepMarch</code></td><td>BOOL</td><td>Jeep is moving</td></tr>
+              <tr><td><code>bJeepStop</code></td><td>BOOL</td><td>Jeep is stopped</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Level State</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>doors[200]</code></td><td>char</td><td>Door state array (open/closed per door index)</td></tr>
+              <tr><td><code>nbVies</code></td><td>int</td><td>Remaining lives</td></tr>
+              <tr><td><code>nbTresor</code></td><td>int</td><td>Treasures collected so far</td></tr>
+              <tr><td><code>totalTresor</code></td><td>int</td><td>Total treasures in the level</td></tr>
+              <tr><td><code>goalPhase</code></td><td>int</td><td>Current goal/objective phase</td></tr>
+              <tr><td><code>scrollPoint</code></td><td>POINT</td><td>Current scroll position</td></tr>
+              <tr><td><code>scrollAdd</code></td><td>POINT</td><td>Scroll velocity</td></tr>
+              <tr><td><code>jaugeHide[2]</code></td><td>BOOL</td><td>Gauge visibility per slot (JAUGE_AIR=0, JAUGE_POWER=1)</td></tr>
+              <tr><td><code>jaugeType[2]</code></td><td>BOOL</td><td>Gauge type per slot</td></tr>
+              <tr><td><code>jaugeLevel[2]</code></td><td>BOOL</td><td>Gauge level per slot</td></tr>
+              <tr><td><code>blupiLevel</code></td><td>int</td><td>Player level</td></tr>
+              <tr><td><code>bFoundCle</code></td><td>BOOL</td><td>Key has been found this level</td></tr>
+              <tr><td><code>bPrivate</code></td><td>BOOL</td><td>Private/custom level flag</td></tr>
+              <tr><td><code>mission</code></td><td>int</td><td>Current mission/level number</td></tr>
+              <tr><td><code>bCheatDoors</code></td><td>BOOL</td><td>Cheat: all doors open (<code>OPENDOORS</code>)</td></tr>
+              <tr><td><code>bSuperBlupi</code></td><td>BOOL</td><td>Cheat: invincible player (<code>MEGABLUPI</code>)</td></tr>
+              <tr><td><code>bDrawSecret</code></td><td>BOOL</td><td>Cheat: show hidden objects (<code>SHOWSECRET</code>)</td></tr>
+              <tr><td><code>bJoystick</code></td><td>BOOL</td><td>Joystick mode flag</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Voyage / Travel System</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>voyageIcon</code></td><td>int</td><td>Icon index for travel animation</td></tr>
+              <tr><td><code>voyageChannel</code></td><td>int</td><td>Channel for travel animation</td></tr>
+              <tr><td><code>voyagePhase</code></td><td>int</td><td>Current phase in the travel sequence</td></tr>
+              <tr><td><code>voyageTotal</code></td><td>int</td><td>Total steps in the travel sequence</td></tr>
+              <tr><td><code>voyageStart</code></td><td>POINT</td><td>Travel start position</td></tr>
+              <tr><td><code>voyageEnd</code></td><td>POINT</td><td>Travel end position</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Decor Animation</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>decorAction</code></td><td>int</td><td>Active decor tile animation action</td></tr>
+              <tr><td><code>decorPhase</code></td><td>int</td><td>Decor animation phase</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Unknown / Decompilation Artifacts</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>idklol</code></td><td>int</td><td>Unknown field (decompilation artifact — name from source)</td></tr>
+              <tr><td><code>d8f8</code></td><td>int</td><td>Unknown field (decompilation artifact — hex address name)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="netpacket">NetPacket</h2>
+        <p>
+          Network synchronization packet sent by each player every game tick.
+          Contains input state, player position, animation, and up to 5 game events.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>size</code></td><td>char</td><td>Packet size in bytes</td></tr>
+              <tr><td><code>type</code></td><td>char</td><td>Packet type (<code>PK_*</code>)</td></tr>
+              <tr><td><code>keyPress</code></td><td>short</td><td>Current key input bitmask (<code>KEY_*</code>)</td></tr>
+              <tr><td><code>time</code></td><td>int</td><td>Simulation time (game tick)</td></tr>
+              <tr><td><code>blupiPosX/Y</code></td><td>short</td><td>Player position</td></tr>
+              <tr><td><code>blupiIcon</code></td><td>short</td><td>Current sprite icon</td></tr>
+              <tr><td><code>blupiSec</code></td><td>short</td><td>Secondary icon</td></tr>
+              <tr><td><code>blupiChannel</code></td><td>char</td><td>Sprite channel</td></tr>
+              <tr><td><code>blupiTransport</code></td><td>char</td><td>Vehicle transport mode</td></tr>
+              <tr><td><code>unk12</code></td><td>char</td><td>Unknown field (decompilation artifact)</td></tr>
+              <tr><td><code>nbMessages</code></td><td>char</td><td>Number of messages in this packet (max 5)</td></tr>
+              <tr><td><code>messages[5]</code></td><td>NetMessage[5]</td><td>Piggy-backed game events</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="netmessage">NetMessage</h2>
+        <p>A compact game event, up to 5 of which can be embedded in a <code>NetPacket</code>.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>type</code></td><td>char</td><td>Message type (<code>MESS_*</code> constant)</td></tr>
+              <tr><td><code>data1</code></td><td>char</td><td>First data byte</td></tr>
+              <tr><td><code>data2</code></td><td>short</td><td>Second data word</td></tr>
+              <tr><td><code>data3</code></td><td>short</td><td>Third data word</td></tr>
+              <tr><td><code>data4</code></td><td>short</td><td>Fourth data word</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="image-channels.html">← <span class="pnl-label">Image Channels</span></a>
+          <a class="page-nav-link next" href="compile-flags.html"><span class="pnl-label">Compile Flags</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('data-structures');</script>
+</body>
+</html>

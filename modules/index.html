@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modules Index — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Modules</span>
+        </nav>
+
+        <h1>Modules Index</h1>
+        <p>Documentation for the core C++ classes and subsystems in Free Eggbert.</p>
+
+        <div class="card-grid">
+          <a class="card" href="cdecor.html">
+            <div class="card-icon">🎮</div>
+            <h3>CDecor</h3>
+            <p>Central game engine — world state, player, all game logic. Split across 8 source files.</p>
+          </a>
+          <a class="card" href="cpixmap.html">
+            <div class="card-icon">🖼️</div>
+            <h3>CPixmap</h3>
+            <p>DirectDraw surface manager — 15 render channels, blitting, sprite drawing, display.</p>
+          </a>
+          <a class="card" href="csound.html">
+            <div class="card-icon">🔊</div>
+            <h3>CSound</h3>
+            <p>Audio system — DirectSound or BASS backend, music tracks, positional sound effects.</p>
+          </a>
+          <a class="card" href="cevent.html">
+            <div class="card-icon">⌨️</div>
+            <h3>CEvent</h3>
+            <p>Input handling and game phase dispatch — the largest and most complex file.</p>
+          </a>
+          <a class="card" href="cnetwork.html">
+            <div class="card-icon">🌐</div>
+            <h3>CNetwork</h3>
+            <p>DirectPlay session management — multiplayer lobby, packet sending/receiving.</p>
+          </a>
+          <a class="card" href="ui.html">
+            <div class="card-icon">🖱️</div>
+            <h3>UI Components</h3>
+            <p>CButton, CJauge, CMenu — UI button rendering, gauge bars, menu navigation.</p>
+          </a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('modules-index');</script>
+</body>
+</html>

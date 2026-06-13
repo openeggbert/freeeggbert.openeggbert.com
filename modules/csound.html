@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSound — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Modules</a>
+          <span class="sep">/</span>
+          <span class="current">CSound</span>
+        </nav>
+
+        <h1>CSound</h1>
+        <p>
+          <strong>Header:</strong> <code>include/sound.hpp</code><br>
+          <strong>Implementation:</strong>
+          <code>src/sound.cpp</code> (DirectSound backend) and
+          <code>src/soundbass.cpp</code> (BASS backend, optional)
+        </p>
+        <p>
+          <code>CSound</code> is the audio system class. It loads and plays background music
+          and positional sound effects from <code>.blp</code> files in
+          <code>gamefiles/SOUND/</code>. Two backends are available, selected at compile time
+          via the <code>_BASS</code> flag.
+        </p>
+
+        <h2 id="backends">Backends</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Backend</th><th>Flag</th><th>Source file</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>DirectSound / MCI</td>
+                <td><code>_BASS=FALSE</code> (default)</td>
+                <td><code>src/sound.cpp</code></td>
+                <td><span class="badge badge-done">Done</span></td>
+              </tr>
+              <tr>
+                <td>BASS + BASSMIDI</td>
+                <td><code>_BASS=TRUE</code></td>
+                <td><code>src/soundbass.cpp</code></td>
+                <td><span class="badge badge-wip">WIP</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          To switch backends, change <code>#define _BASS</code> in <code>include/def.hpp</code>
+          and rebuild. See <a href="../reference/compile-flags.html">Compile Flags</a>.
+        </p>
+
+        <h2 id="directsound">DirectSound Backend</h2>
+        <p>
+          The default backend wraps DirectSound from DirectX 3. Via Free Direct / Free API,
+          DirectSound calls are translated to SDL3_mixer.
+        </p>
+        <ul>
+          <li>Loads <code>.blp</code> sound files via <code>src/wave.cpp</code> (WAV parsing)</li>
+          <li>Supports 3D positional audio: sounds play louder when the source is near the player</li>
+          <li>Vehicle sounds (helicopter, jeep) loop and change pitch based on movement state</li>
+          <li>Music uses the MCI (Media Control Interface) path for <code>MUSIC*.blp</code> files</li>
+        </ul>
+
+        <h2 id="bass-backend">BASS Backend</h2>
+        <p>
+          Implemented in <code>src/soundbass.cpp</code> using the BASS and BASSMIDI libraries
+          located in the <code>bass/</code> subdirectory.
+        </p>
+        <ul>
+          <li>MIDI music support via BASSMIDI</li>
+          <li>Alternative to DirectSound for higher quality audio on non-Windows builds</li>
+        </ul>
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            BASS is not free software; its licensing restricts commercial use.
+            The default DirectSound backend is preferred for open-source builds.
+          </div>
+        </div>
+
+        <h2 id="music">Music</h2>
+        <p>
+          10 background music tracks are stored as <code>MUSIC000.blp</code> through
+          <code>MUSIC009.blp</code>. The track for each level is defined in
+          <code>DescFile::music</code> (0–9) and loaded when the level starts.
+          Music stops and restarts when transitioning between regions.
+        </p>
+
+        <h2 id="sound-effects">Sound Effects</h2>
+        <p>
+          93 sound effect files: <code>SOUND000.blp</code> through <code>SOUND092.blp</code>.
+          Filenames on disk have mixed case (e.g., <code>Sound027.blp</code>); the index directly
+          maps to the <code>SOUND_*</code> constant.
+        </p>
+        <p>
+          See <a href="../reference/sound-effects.html">Sound Effects Reference</a> for the
+          complete <code>SOUND_*</code> constant table.
+        </p>
+
+        <h2 id="key-methods">Key Methods</h2>
+        <p>Full signatures from <code>include/sound.hpp</code>:</p>
+        <pre><code><span class="cmt">// Lifecycle</span>
+BOOL Create(HWND hWnd);
+<span class="kw">void</span> SetState(BOOL bState);
+BOOL GetEnable();
+<span class="kw">void</span> Flush(<span class="kw2">int</span> channel);       <span class="cmt">// unload one channel</span>
+<span class="kw">void</span> CacheAll();               <span class="cmt">// preload all sound channels</span>
+BOOL Cache(<span class="kw2">int</span> channel, <span class="kw2">char</span>* pFilename);
+
+<span class="cmt">// Volume</span>
+<span class="kw">void</span> SetAudioVolume(<span class="kw2">int</span> volume);
+<span class="kw2">int</span>  GetAudioVolume();
+<span class="kw">void</span> SetMidiVolume(<span class="kw2">int</span> volume);
+<span class="kw2">int</span>  GetMidiVolume();
+
+<span class="cmt">// Music</span>
+BOOL PlayMusic(HWND hWnd, <span class="kw2">int</span> music);
+BOOL RestartMusic();
+<span class="kw">void</span> SuspendMusic();
+<span class="kw">void</span> StopMusic();
+BOOL IsPlayingMusic();
+<span class="kw">void</span> SetSuspendSkip(<span class="kw2">int</span> nb);
+
+<span class="cmt">// Sound effects (positional)</span>
+BOOL Play(<span class="kw2">int</span> channel, <span class="kw2">int</span> volume = 0, <span class="kw2">int</span> pan = 0);
+BOOL PlayImage(<span class="kw2">int</span> channel, POINT pos, <span class="kw2">int</span> rank = -1);  <span class="cmt">// called from CDecor/CEvent</span>
+BOOL StopSound(<span class="kw2">int</span> channel);</code></pre>
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            The method used for positional game sounds is <code>PlayImage()</code>,
+            not <code>PlaySound()</code>. The name is inherited from the original codebase.
+            <code>CDecor</code> calls it as <code>m_pSound->PlayImage(SOUND_*, pos, rank)</code>.
+          </div>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="cpixmap.html">← <span class="pnl-label">CPixmap</span></a>
+          <a class="page-nav-link next" href="cevent.html"><span class="pnl-label">CEvent</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('csound');</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Tutorials</a>
+          <span class="sep">/</span>
+          <span class="current">Building</span>
+        </nav>
+
+        <h1>Building Free Eggbert</h1>
+        <p>
+          This tutorial walks through building Free Eggbert from source on each supported platform.
+          For a reference overview, see <a href="../build.html">Build &amp; Compile</a>.
+        </p>
+
+        <h2 id="prerequisites">Prerequisites (All Platforms)</h2>
+        <ul>
+          <li><strong>Git</strong> — for cloning and submodules</li>
+          <li><strong>CMake 3.20+</strong></li>
+          <li><strong>C++20 compiler</strong> (GCC 11+, Clang 13+, MSVC 2022+)</li>
+          <li><strong>Game assets</strong> — must be obtained from an original copy of Speedy Eggbert 2;
+            place them in <code>gamefiles/</code> as described in <a href="../assets.html">Assets &amp; Files</a></li>
+        </ul>
+
+        <h2 id="linux-macos">Linux / macOS</h2>
+        <h3>Step 1 — Clone the repository</h3>
+        <pre><code>git clone &lt;repo-url&gt; free-eggbert
+cd free-eggbert
+git submodule update --init --recursive</code></pre>
+        <h3>Step 2 — Configure with CMake</h3>
+        <pre><code>cmake -S . -B build -DSPEEDY_BLUPI_BACKEND=FREEDIRECT</code></pre>
+        <p>
+          This uses the vendored SDL submodule by default.
+          To use system-installed SDL instead, add <code>-DFREE_USE_SYSTEM_SDL=ON</code>.
+        </p>
+        <h3>Step 3 — Build</h3>
+        <pre><code>cmake --build build -j$(nproc)</code></pre>
+        <h3>Step 4 — Place assets and run</h3>
+        <pre><code>cp -r /path/to/original/gamefiles ./gamefiles
+./build/bin/SPEEDY_BLUPI_WINDOWS</code></pre>
+        <h3>Clean rebuild</h3>
+        <pre><code>rm -rf build
+cmake -S . -B build -DSPEEDY_BLUPI_BACKEND=FREEDIRECT
+cmake --build build -j$(nproc)</code></pre>
+
+        <h2 id="windows-msvc">Windows (Visual Studio 2022)</h2>
+        <h3>Prerequisites</h3>
+        <ul>
+          <li>Visual Studio 2022 with C++ workload</li>
+          <li>CMake (bundled with VS 2022 or standalone)</li>
+        </ul>
+        <h3>Step 1 — Clone</h3>
+        <pre><code>git clone &lt;repo-url&gt; free-eggbert
+cd free-eggbert
+git submodule update --init --recursive</code></pre>
+        <h3>Step 2 — Configure</h3>
+        <pre><code>cmake -S . -B build -G "Visual Studio 17 2022" -A x64 ^
+      -DSPEEDY_BLUPI_BACKEND=FREEDIRECT</code></pre>
+        <h3>Step 3 — Build (command line or IDE)</h3>
+        <pre><code>cmake --build build --config Release</code></pre>
+        <p>Or open <code>build/SPEEDY_BLUPI_WINDOWS.sln</code> in Visual Studio and build from the IDE.</p>
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            If the build fails with COM header errors, ensure the Windows SDK is installed with
+            the correct COM headers. See <a href="../build.html#visual-studio">Build &amp; Compile — Visual Studio</a>.
+          </div>
+        </div>
+
+        <h2 id="emscripten">Emscripten (WebAssembly)</h2>
+        <h3>Prerequisites</h3>
+        <ul>
+          <li>Emscripten SDK (<code>emsdk</code>) installed and activated</li>
+        </ul>
+        <h3>Step 1 — Activate emsdk</h3>
+        <pre><code>source /path/to/emsdk/emsdk_env.sh</code></pre>
+        <h3>Step 2 — Configure and build</h3>
+        <pre><code>emcmake cmake -S . -B cmake-build-web -DCMAKE_BUILD_TYPE=Debug
+cmake --build cmake-build-web -j</code></pre>
+        <p>
+          Game assets from <code>gamefiles/</code> are preloaded into the Emscripten virtual
+          filesystem at build time — no manual copying is required for the web build.
+        </p>
+        <h3>Step 3 — Run locally</h3>
+        <pre><code>emrun cmake-build-web/bin/SPEEDY_BLUPI_WINDOWS.html</code></pre>
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            Save data is stored in IndexedDB via Emscripten's IDBFS, mounted at <code>/save</code>.
+            To flush saves from the browser console:
+            <code>Module.ccall('FreeEggbert_ExportPersistentData', null, [], []);</code>
+          </div>
+        </div>
+
+        <h2 id="android">Android</h2>
+        <p>
+          Android build support is present under <code>android/</code>.
+          See <a href="../platform-support.html#android">Platform Support — Android</a> for
+          the complete step-by-step guide.
+        </p>
+
+        <div class="callout todo">
+          <span class="callout-icon">📋</span>
+          <div class="callout-body">
+            <div class="callout-title">Build Verification Needed</div>
+            A clean checkout build from scratch has not been fully verified for all platforms.
+            If you encounter build failures, please check
+            <a href="../development/known-issues.html#build">Known Issues — Build</a> first.
+          </div>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="index.html">← <span class="pnl-label">Tutorials Index</span></a>
+          <a class="page-nav-link next" href="running.html"><span class="pnl-label">Running</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('tut-building');</script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platform Support — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Platform Support</span>
+        </nav>
+
+        <h1>Platform Support</h1>
+        <p>Free Eggbert supports multiple platforms through the FreeDirect/SDL3 abstraction layer.</p>
+
+        <h2 id="summary">Summary</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Platform</th><th>Backend</th><th>Status</th><th>Build Method</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Windows (native DirectX)</td>
+                <td>DirectDraw / DirectSound</td>
+                <td><span class="badge badge-partial">Partial</span></td>
+                <td>Visual Studio 2022</td>
+              </tr>
+              <tr>
+                <td>Windows (FreeDirect)</td>
+                <td>SDL3</td>
+                <td><span class="badge badge-partial">Partial</span></td>
+                <td>CMake</td>
+              </tr>
+              <tr>
+                <td>Linux</td>
+                <td>SDL3 (FreeDirect)</td>
+                <td><span class="badge badge-partial">Partial</span></td>
+                <td>CMake</td>
+              </tr>
+              <tr>
+                <td>macOS</td>
+                <td>SDL3 (FreeDirect)</td>
+                <td><span class="badge badge-verify">Needs Verification</span></td>
+                <td>CMake</td>
+              </tr>
+              <tr>
+                <td>WebAssembly</td>
+                <td>Emscripten + SDL3</td>
+                <td><span class="badge badge-partial">Partial</span></td>
+                <td>emcmake</td>
+              </tr>
+              <tr>
+                <td>Android</td>
+                <td>SDL3 (NDK)</td>
+                <td><span class="badge badge-partial">Partial</span></td>
+                <td>Gradle + CMake</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="windows">Windows</h2>
+        <h3 id="windows-native">Native DirectX (Visual Studio)</h3>
+        <p>
+          The original build target uses the real DirectX 3 SDK (<code>dxsdk3</code> submodule)
+          with Visual Studio 2022. This path uses DirectDraw and DirectSound directly.
+        </p>
+        <div class="callout verify">
+          <span class="callout-icon">🔍</span>
+          <div class="callout-body">
+            <div class="callout-title">Needs Verification</div>
+            The native DirectX 3 path may expose decompilation artifacts that the FreeDirect
+            backend tolerates but real DirectDraw rejects. See
+            <a href="development/known-issues.html">Known Issues</a> for details on the
+            suspected double <code>CPixmap::Create()</code> call and fullscreen initialization problems.
+          </div>
+        </div>
+
+        <h3 id="windows-cmake">CMake + FreeDirect</h3>
+        <p>Building with CMake on Windows uses the FreeDirect backend instead of real DirectX.
+           This requires the <code>third_party/</code> SDL submodules.</p>
+        <pre><code>git submodule update --init --recursive
+cmake -S . -B build -G <span class="str">"Visual Studio 17 2022"</span> -DSPEEDY_BLUPI_BACKEND=FREEDIRECT
+cmake --build build --config Debug</code></pre>
+
+        <h2 id="linux-macos">Linux / macOS</h2>
+        <p>Build using CMake with the FreeDirect backend. No system SDL packages required by default.</p>
+        <pre><code>git submodule update --init --recursive
+cmake -S . -B build -DSPEEDY_BLUPI_BACKEND=FREEDIRECT
+cmake --build build -j</code></pre>
+        <p>
+          On Linux the default compiler is GCC or Clang. The permissive compiler flags
+          (<code>-fpermissive</code>, <code>-fms-extensions</code>, etc.) handle
+          decompiled code constructs that strict C++ would reject.
+        </p>
+
+        <h2 id="web">WebAssembly (Emscripten)</h2>
+        <h3 id="web-build">Build</h3>
+        <pre><code>source /path/to/emsdk/emsdk_env.sh
+emcmake cmake -S . -B cmake-build-web -DCMAKE_BUILD_TYPE=Debug
+cmake --build cmake-build-web -j
+emrun cmake-build-web/bin/SPEEDY_BLUPI_WINDOWS.html</code></pre>
+
+        <h3 id="web-assets">Assets</h3>
+        <p>
+          Game assets are preloaded into the Emscripten virtual filesystem at build time
+          from <code>gamefiles/DATA</code>, <code>gamefiles/IMAGE08</code>,
+          <code>gamefiles/IMAGE16</code>, and <code>gamefiles/SOUND</code>.
+        </p>
+
+        <h3 id="web-persistence">Persistent Saves</h3>
+        <p>
+          Save data is stored in the browser's IndexedDB via Emscripten IDBFS,
+          mounted at <code>/save</code>. This persists across page reloads.
+          Clearing browser site data resets the saves.
+        </p>
+        <pre><code><span class="cmt">// Export save data</span>
+Module.ccall(<span class="str">'FreeEggbert_ExportPersistentData'</span>, null, [], []);
+
+<span class="cmt">// Import save data</span>
+Module.ccall(<span class="str">'FreeEggbert_ImportPersistentData'</span>, null, [], []);</code></pre>
+
+        <h3 id="web-rendering">Web Rendering</h3>
+        <p>
+          On widescreen displays, the game image is automatically letterboxed using
+          SDL3's logical presentation mode. Touch and mouse coordinates are mapped
+          from physical screen coordinates into game logical coordinates — touches
+          on black bars do not register as in-game clicks.
+        </p>
+
+        <h3 id="web-message-loop">Message Loop Consideration</h3>
+        <p>
+          The native build uses a classic Win32 message loop with a multimedia timer.
+          Emscripten does not work well with a blocking infinite loop, so the web version
+          needs a Free API / launcher-level main-loop adapter. This is an active
+          area of work and is handled at the FreeDirect layer, not in game code.
+        </p>
+
+        <h2 id="android">Android</h2>
+
+        <h3 id="android-prerequisites">Prerequisites</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tool</th><th>Recommended Version</th></tr></thead>
+            <tbody>
+              <tr><td>Android Studio</td><td>Ladybug (2024.2) or newer</td></tr>
+              <tr><td>Android SDK</td><td>API level 35</td></tr>
+              <tr><td>Android NDK</td><td>30.0.14904198</td></tr>
+              <tr><td>CMake (NDK bundle)</td><td>3.21+ via SDK Manager</td></tr>
+              <tr><td>Java (JDK)</td><td>17 (bundled with Android Studio)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="android-setup">Setup</h3>
+        <ol>
+          <li>Open <strong>Android Studio → Settings → SDK Manager → SDK Tools</strong></li>
+          <li>Check <strong>NDK (Side by side)</strong> version 30.0.14904198</li>
+          <li>Check <strong>CMake</strong> version 3.21+</li>
+          <li>Click Apply and let Android Studio download and install</li>
+          <li>Create <code>android/local.properties</code>:
+            <pre><code>cp android/local.properties.template android/local.properties
+<span class="cmt"># Edit and set sdk.dir to your Android SDK path</span></code></pre>
+          </li>
+        </ol>
+
+        <h3 id="android-assets">Game Assets on Android</h3>
+        <p>
+          Game assets are linked via symbolic links in <code>android/app/src/main/assets/</code>:
+        </p>
+        <div class="file-tree">
+android/app/src/main/assets/
+├── data    → ../../../../../gamefiles/DATA
+├── image08 → ../../../../../gamefiles/IMAGE08
+├── image16 → ../../../../../gamefiles/IMAGE16
+└── sound   → ../../../../../gamefiles/SOUND
+        </div>
+        <p>If symbolic links don't work, copy the directories instead:</p>
+        <pre><code>cd android/app/src/main/assets
+cp -r ../../../../../gamefiles/DATA  data
+cp -r ../../../../../gamefiles/IMAGE08 image08
+cp -r ../../../../../gamefiles/IMAGE16 image16
+cp -r ../../../../../gamefiles/SOUND  sound</code></pre>
+
+        <h3 id="android-build">Build</h3>
+        <pre><code>cd android
+./gradlew assembleDebug</code></pre>
+        <p>Output: <code>android/app/build/outputs/apk/debug/app-debug.apk</code></p>
+
+        <h3 id="android-install">Install and Run</h3>
+        <pre><code><span class="cmt"># Clear previous install (resets extracted assets and save data)</span>
+adb shell pm clear org.openeggbert.freeeggbert
+
+<span class="cmt"># Install</span>
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+
+<span class="cmt"># Launch</span>
+adb shell am start -n org.openeggbert.freeeggbert/.FreeEggbertActivity</code></pre>
+
+        <h3 id="android-logcat">Logcat Diagnostics</h3>
+        <pre><code>adb logcat | grep -E <span class="str">"SDL|FREEAPI|FREE_DIRECT|Eggbert|free-eggbert"</span></code></pre>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Log Tag / Message</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code>free-api: SDL_main starting</code></td><td>SDL_main entry point reached</td></tr>
+              <tr><td><code>free-api: FreeApiAndroidSetup begin</code></td><td>Android asset setup started</td></tr>
+              <tr><td><code>FREEAPI_ANDROID: smoke-test data/config.def EXISTS</code></td><td>Required config file found</td></tr>
+              <tr><td><code>free-api: asset extraction complete</code></td><td>All assets extracted successfully</td></tr>
+              <tr><td><code>FREE_DIRECT_PRESENT: source=…</code></td><td>Render loop is running</td></tr>
+              <tr><td><code>FREE_DIRECT_INPUT: raw=…</code></td><td>Input events being processed</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="android-release">Release APK</h3>
+        <pre><code><span class="cmt"># Create a keystore</span>
+keytool -genkey -v -keystore android/free-eggbert-release.keystore \
+        -alias free-eggbert -keyalg RSA -keysize 2048 -validity 10000
+
+<span class="cmt"># Create android/key.properties with keystore credentials</span>
+<span class="cmt"># Build the signed release APK</span>
+cd android
+./gradlew assembleRelease</code></pre>
+
+        <h3 id="android-troubleshoot">Android Troubleshooting</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Problem</th><th>Solution</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>INSTALL_FAILED_UPDATE_INCOMPATIBLE</code></td>
+                <td>Uninstall first: <code>adb uninstall org.openeggbert.freeeggbert</code></td>
+              </tr>
+              <tr>
+                <td>App exits immediately</td>
+                <td>Asset extraction failed. Check logcat for <code>free-api:</code> entries. Verify symlinks in <code>android/app/src/main/assets/</code></td>
+              </tr>
+              <tr>
+                <td>No audio</td>
+                <td>Verify sound files are present in the APK. Check SDL_mixer WAV support.</td>
+              </tr>
+              <tr>
+                <td>Crash on launch</td>
+                <td>Check logcat for native crash. Common: missing <code>libmain.so</code> or incomplete <code>git submodule update</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="rendering-on-all-platforms">Rendering Across Platforms</h2>
+        <p>
+          Free Eggbert uses a fixed 640×480 logical resolution. On all platforms via FreeDirect,
+          the game renders to this size and SDL3 handles scaling to the actual display:
+        </p>
+        <ul>
+          <li><strong>Desktop</strong>: Windowed at 640×480, resizable with letterboxing</li>
+          <li><strong>Web</strong>: Letterboxed to fit the browser window</li>
+          <li><strong>Android</strong>: Letterboxed to the device screen, black bars on sides or top/bottom</li>
+        </ul>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="running.html">← <span class="pnl-label">Running the Game</span></a>
+          <a class="page-nav-link next" href="architecture.html"><span class="pnl-label">Architecture</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('platform-support');</script>
+</body>
+</html>

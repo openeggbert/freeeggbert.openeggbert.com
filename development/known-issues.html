@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Known Issues — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Developer Guide</a>
+          <span class="sep">/</span>
+          <span class="current">Known Issues</span>
+        </nav>
+
+        <h1>Known Issues</h1>
+        <p>
+          Detailed technical issue list maintained in <code>TODO.md</code>.
+          Items are organized by subsystem. This page documents issues and investigation tasks;
+          see <a href="../roadmap.html">Roadmap</a> for prioritized next steps.
+        </p>
+
+        <h2 id="build">Build and Dependencies</h2>
+        <h3>Build verification</h3>
+        <ul>
+          <li>Clean checkout build needs verification after:
+            <pre><code>git submodule update --init --recursive
+cmake -S . -B build -DSPEEDY_BLUPI_BACKEND=FREEDIRECT
+cmake --build build -j</code></pre>
+          </li>
+          <li>Confirm default Linux build does not require system-installed SDL packages (<code>FREE_USE_SYSTEM_SDL</code> defaults <code>OFF</code>)</li>
+          <li>Verify <code>FREE_USE_SYSTEM_SDL=ON</code> override still works</li>
+          <li>Confirm <code>free-api</code> and <code>free-direct</code> link SDL as <code>PRIVATE</code></li>
+          <li>Confirm no game source file directly includes SDL headers</li>
+          <li>Scan: <code>grep -R "#include &lt;SDL" -n src include</code></li>
+        </ul>
+        <h3>CMake cleanup</h3>
+        <ul>
+          <li>
+            Change <code>target_include_directories</code> for <code>SPEEDY_BLUPI_WINDOWS</code>
+            from <code>PUBLIC</code> to <code>PRIVATE</code> (executables don't need public include dirs)
+          </li>
+          <li>Verify whether <code>/permissive-</code> MSVC flag is appropriate for decompiled C++</li>
+          <li>
+            Keep compiler option changes separate from gameplay/decompilation fixes;
+            non-MSVC flags (<code>-fpermissive -fms-extensions -w -Wno-narrowing</code>) are
+            intentional suppressors for decompiled code
+          </li>
+          <li>
+            <code>cmake/ThirdPartySDL.cmake</code> function name must stay
+            <code>configure_vendored_sdl()</code> — do not reintroduce old names
+          </li>
+        </ul>
+
+        <h2 id="directdraw">DirectDraw Initialization</h2>
+
+        <div class="callout danger">
+          <span class="callout-icon">🚨</span>
+          <div class="callout-body">
+            <div class="callout-title">Three confirmed reasons fullscreen behaves differently on Free Direct vs real DirectX 3</div>
+            <ol>
+              <li><code>CPixmap::Create()</code> is called twice during startup without releasing previous DirectDraw objects</li>
+              <li><code>bTrueColorBack</code> / <code>bTrueColorDecor</code> parameters are inconsistent between declaration, definition, and call sites</li>
+              <li><code>CacheAll()</code> contains decompilation artifacts: <code>delete this</code> + member access, suspicious <code>LOWORD</code>/<code>HIWORD</code> usage, nonsensical rectangle initialization</li>
+            </ol>
+          </div>
+        </div>
+
+        <h3>Double CPixmap::Create() call</h3>
+        <p>
+          Startup currently calls <code>CPixmap::Create()</code> twice: once directly in
+          <code>DoInit()</code> and then again inside <code>CacheAll(TRUE, ...)</code>.
+          Real DirectDraw 3 may reject the second call with:
+          <code>DDERR_PRIMARYSURFACEALREADYEXISTS</code>,
+          <code>DDERR_EXCLUSIVEMODEALREADYSET</code>, or
+          <code>DDERR_INVALIDPARAMS</code>.
+          Free Direct currently tolerates this.
+        </p>
+        <ul>
+          <li>Confirm whether <code>CPixmap::Create()</code> is really called twice</li>
+          <li>Add logging at entry/exit of <code>CPixmap::Create()</code></li>
+          <li>Log whether <code>m_lpDD</code>, <code>m_lpDDSPrimary</code> already exist before the second call</li>
+          <li>Decide: either <code>DoInit()</code> or <code>CacheAll()</code> should own DirectDraw initialization, not both</li>
+          <li>If recreation is needed, add a proper cleanup path before re-initialization</li>
+        </ul>
+
+        <h3>Parameter swap: bTrueColorBack / bTrueColorDecor</h3>
+        <p>
+          The <code>CPixmap::Create()</code> declaration in <code>pixmap.hpp</code> and
+          the definition in <code>pixmap.cpp</code> have the <code>bTrueColor</code> and
+          <code>bTrueColorDecor</code> parameters in opposite positions, so the wrong value
+          is used for each:
+        </p>
+        <pre><code><span class="cmt">// Declaration (pixmap.hpp)</span>
+BOOL Create(HWND hwnd, POINT dim, BOOL bFullScreen, <span class="kw2">int</span> mouseType,
+            BOOL bTrueColor, BOOL bTrueColorDecor);
+
+<span class="cmt">// Definition (pixmap.cpp) — names are swapped!</span>
+BOOL CPixmap::Create(HWND hwnd, POINT dim, BOOL bFullScreen, <span class="kw2">int</span> mouseType,
+                     BOOL bTrueColorDecor, BOOL bTrueColor)</code></pre>
+        <ul>
+          <li>Audit all call sites and the intended meaning of each parameter</li>
+          <li>Compare with Planet Blupi source for reference</li>
+          <li>Do not change behavior until logging proves current behavior is wrong</li>
+          <li>Test configurations where background and decor truecolor settings differ</li>
+        </ul>
+
+        <h3>Dangerous delete this in CacheAll(FALSE)</h3>
+        <p>
+          <code>CPixmap::CacheAll(FALSE)</code> contains a <code>delete this</code> followed
+          immediately by reads of <code>m_hWnd</code>, <code>m_bFullScreen</code>, etc.
+          This is undefined behavior — reading object members after destroying the object.
+        </p>
+        <ul>
+          <li>Investigate whether this code path is actually executed at runtime</li>
+          <li>Treat as likely decompilation artifact or incorrectly reconstructed logic</li>
+          <li>If object recreation is required, save needed values before destruction</li>
+          <li>Never access object members after <code>delete this</code></li>
+        </ul>
+
+        <h3>Suspicious rectangle initialization in CacheAll(TRUE)</h3>
+        <p>
+          Decompiled code contains a nonsensical rectangle setup, likely a Ghidra artifact:
+        </p>
+        <pre><code><span class="cmt">// Likely wrong — decompiled artifact</span>
+<span class="kw2">char</span> image[12];
+*(<span class="kw2">char</span>*)image = (LXIMAGE) &lt;&lt; 64;   <span class="cmt">// nonsensical shift</span>
+rect.left  = LOWORD(image);         <span class="cmt">// LOWORD on a local array?</span>
+rect.right = HIWORD(image);
+
+<span class="cmt">// Likely intended</span>
+SetRect(&amp;rect, 0, 0, LXIMAGE, LYIMAGE);</code></pre>
+        <ul>
+          <li>Investigate in Ghidra and compare with Planet Blupi source</li>
+          <li>Replace only after confirming the intended behavior</li>
+        </ul>
+
+        <h2 id="gameplay">Gameplay</h2>
+        <ul>
+          <li>Many movement and physics behaviors in <code>decblupi.cpp</code> (4,395 lines) need verification against the original game</li>
+          <li>Network synchronization in <code>decnet.cpp</code> is incomplete</li>
+          <li>Level editor in <code>decdesign.cpp</code> has known missing features</li>
+          <li>Save/load in <code>decio.cpp</code> may have version compatibility gaps if <code>DescSave</code> layout has changed</li>
+        </ul>
+
+        <h2 id="audio">Audio</h2>
+        <p>
+          With <code>#define _BASS FALSE</code>, the active implementation is the
+          DirectSound / MCI path. The setup uses preprocessor conditions:
+        </p>
+        <ul>
+          <li>Verify <code>_BASS=FALSE</code> is intentional and README audio notes are current</li>
+          <li>Do not mix audio backend cleanup with DirectDraw fullscreen investigation</li>
+          <li>Consider a future CMake option: <code>FREE_EGGBERT_AUDIO_BACKEND=DSOUND|BASS|STUB</code></li>
+        </ul>
+
+        <h2 id="network">Network</h2>
+        <p>
+          <code>CNetwork::CreateProvider(0)</code> is called at startup but likely fails
+          silently because <code>m_providers.nb</code> starts at 0 (no provider enumeration
+          has been called yet). The return value is ignored, so the game continues in
+          singleplayer mode.
+        </p>
+        <p>
+          Additionally, <code>CNetwork::Receive()</code> reads into a local buffer but
+          does not copy the data into the caller's destination buffer before returning
+          <code>TRUE</code> — this appears to be a reconstruction bug.
+        </p>
+        <ul>
+          <li>Treat networking / DirectPlay as incomplete</li>
+          <li>Audit <code>CNetwork::EnumProviders()</code>, <code>CreateProvider()</code>, and <code>Receive()</code></li>
+          <li>Consider stubbing network cleanly for singleplayer builds</li>
+        </ul>
+
+        <h2 id="directx-sdk">DirectX SDK / dxsdk3 Submodule</h2>
+        <ul>
+          <li><code>dxsdk3</code> is still listed in <code>.gitmodules</code> even though the build is focused on <code>FREEDIRECT</code></li>
+          <li>Decide whether <code>dxsdk3</code> is needed for reference, legacy builds, or real DirectX 3 comparison builds</li>
+          <li>If only historical, document that clearly</li>
+        </ul>
+
+        <h2 id="message-loop">Message Loop and Web Support</h2>
+        <p>
+          The native desktop build uses a classic Win32 blocking message loop with a
+          multimedia timer. Emscripten does not work well with this; the web version
+          needs a Free API / launcher-level main-loop adapter.
+        </p>
+        <ul>
+          <li>Keep the native Win32-style loop intact for desktop builds</li>
+          <li>For web builds, design an adapter at the Free API or launcher level</li>
+          <li>Do not hack <code>src/blupi.cpp</code> to satisfy Emscripten</li>
+          <li>Keep web work separate from DirectDraw fullscreen debugging</li>
+        </ul>
+
+        <h2 id="debug-priority">Recommended Debugging Priority</h2>
+        <ol>
+          <li>Add detailed logging around DirectDraw initialization in <code>CPixmap::Create()</code></li>
+          <li>Verify whether <code>CPixmap::Create()</code> is really called twice</li>
+          <li>Capture the exact <code>HRESULT</code> from the second <code>DirectDrawCreate</code>, <code>SetCooperativeLevel</code>, <code>SetDisplayMode</code>, and <code>CreateSurface</code> calls</li>
+          <li>Decide ownership of <code>CPixmap::Create()</code> — either <code>DoInit()</code> or <code>CacheAll()</code>, not both</li>
+          <li>Clarify the <code>bTrueColorBack</code> / <code>bTrueColorDecor</code> parameter order</li>
+          <li>Keep unrelated systems separate during investigation</li>
+          <li>Only after the fullscreen path is understood, continue with web/Android portability</li>
+        </ol>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="index.html">← <span class="pnl-label">Dev Guide Index</span></a>
+          <a class="page-nav-link next" href="decompilation-notes.html"><span class="pnl-label">Decompilation Notes</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('known-issues');</script>
+</body>
+</html>

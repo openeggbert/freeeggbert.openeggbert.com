@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assets &amp; Files — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-depth="0">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Assets &amp; Files</span>
+        </nav>
+
+        <h1>Assets &amp; Files</h1>
+
+        <div class="callout danger">
+          <span class="callout-icon">⛔</span>
+          <div class="callout-body">
+            <div class="callout-title">Assets Not Included</div>
+            All game assets use the <code>.blp</code> binary format and are
+            <strong>copyrighted by their original authors</strong>. They are not included
+            in the repository and must be obtained from a legal copy of
+            <strong>Speedy Eggbert 2</strong>.
+          </div>
+        </div>
+
+        <h2 id="blp-format">The .blp Format</h2>
+        <p>
+          All game assets use the <strong><code>.blp</code> binary format</strong>,
+          inherited from Planet Blupi. This format is used for images, sounds, music,
+          levels, and save data. The exact file format specification is not fully documented.
+        </p>
+        <div class="callout verify">
+          <span class="callout-icon">🔍</span>
+          <div class="callout-body">
+            <div class="callout-title">Needs Verification</div>
+            The .blp binary format structure is not fully reverse-engineered.
+            It is listed as a documentation goal in the project TODO.
+          </div>
+        </div>
+
+        <h2 id="directory-layout">gamefiles/ Directory Layout</h2>
+        <div class="file-tree">
+<span class="dir">gamefiles/</span>
+├── <span class="dir">DATA/</span>      <span class="note">~110 .blp files — level worlds, demos, config</span>
+├── <span class="dir">IMAGE08/</span>   <span class="note">~68 .blp files — 8-bit palette images</span>
+├── <span class="dir">IMAGE16/</span>   <span class="note">~55 .blp files — 16-bit true-color images</span>
+└── <span class="dir">SOUND/</span>     <span class="note">~103 files — music and sound effects</span>
+        </div>
+
+        <h2 id="data">DATA/ Directory</h2>
+        <p>Contains level worlds, demo recordings, configuration, and reference data.</p>
+
+        <h3 id="data-config">Configuration</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>config.def</code></td><td>Plain-text user settings (FullScreen, color depth, mouse type, speed, timer)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="data-worlds">Level Worlds</h3>
+        <p>Level files follow the naming scheme <code>worldNNN.blp</code> where NNN is a 3-digit chapter/level number.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File Range</th><th>Chapter</th><th>Count</th></tr></thead>
+            <tbody>
+              <tr><td><code>world001.blp</code></td><td>Tutorial / intro level</td><td>1</td></tr>
+              <tr><td><code>world010</code>, <code>world020</code>–<code>world025</code></td><td>Chapter 1</td><td>7</td></tr>
+              <tr><td><code>world030</code>–<code>world034</code>, <code>world040</code>–<code>world046</code></td><td>Chapter 2</td><td>12</td></tr>
+              <tr><td><code>world050</code>–<code>world058</code></td><td>Chapter 3</td><td>9</td></tr>
+              <tr><td><code>world060</code>–<code>world066</code></td><td>Chapter 4</td><td>7</td></tr>
+              <tr><td><code>world070</code>–<code>world075</code></td><td>Chapter 5</td><td>6</td></tr>
+              <tr><td><code>world080</code>–<code>world084</code></td><td>Chapter 6</td><td>5</td></tr>
+              <tr><td><code>world090</code>–<code>world095</code></td><td>Chapter 7</td><td>6</td></tr>
+              <tr><td><code>world100</code>–<code>world107</code></td><td>Chapter 8</td><td>8</td></tr>
+              <tr><td><code>world110</code>–<code>world115</code></td><td>Chapter 9</td><td>6</td></tr>
+              <tr><td><code>world120</code>–<code>world125</code></td><td>Chapter 10</td><td>6</td></tr>
+              <tr><td><code>world199</code></td><td>Special</td><td>1</td></tr>
+              <tr><td><code>world201</code>–<code>world212</code></td><td>Bonus / extra</td><td>12</td></tr>
+              <tr><td><code>world300</code>–<code>world309</code></td><td>Special / secret</td><td>10</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><em>Pattern: the first digit of NNN encodes the chapter (1–9, 0=special, 2=bonus, 3=secret).</em></p>
+
+        <h3 id="data-demos">Demo Recordings</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File Range</th><th>Count</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>demo300.blp</code>–<code>demo309.blp</code></td><td>10</td><td>Prerecorded demo playbacks for attract mode</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="data-other">Other DATA Files</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>bench.blp</code></td><td>Benchmark reference data</td></tr>
+              <tr><td><code>time.blp</code></td><td>Timing / speed reference data</td></tr>
+              <tr><td><code>info001.blp</code></td><td>Level info / statistics</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="image08">IMAGE08/ Directory — 8-bit Images</h2>
+        <p>
+          Contains ~68 <code>.blp</code> files. These are used when
+          <code>TrueColorBack=8</code> or <code>TrueColorDecor=8</code> in <code>config.def</code>.
+        </p>
+
+        <h3 id="image08-characters">Character Sprites</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Channel</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>blupi000.blp</code></td><td><code>CHBLUPI</code></td><td>Default player character sprites</td></tr>
+              <tr><td><code>blupi001.blp</code></td><td><code>CHBLUPI1</code></td><td>Player character variant 1 (multiplayer)</td></tr>
+              <tr><td><code>blupi002.blp</code></td><td><code>CHBLUPI2</code></td><td>Player character variant 2 (multiplayer)</td></tr>
+              <tr><td><code>blupi003.blp</code></td><td><code>CHBLUPI3</code></td><td>Player character variant 3 (multiplayer)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="image08-terrain">Terrain / Decor Sheets</h3>
+        <p>32 sheets, one per world region/theme (e.g., grass, cave, snow, underwater):</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File Range</th><th>Channel</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>decor000.blp</code>–<code>decor031.blp</code></td><td><code>CHBACK</code> / <code>CHDECOR</code></td><td>Background terrain sheets for each visual region</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="image08-sprites">Other Sprites</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Channel</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>element.blp</code></td><td><code>CHELEMENT</code></td><td>Particle and element effects</td></tr>
+              <tr><td><code>explo.blp</code></td><td><code>CHEXPLO</code></td><td>Explosion sprites (128×128 px each)</td></tr>
+              <tr><td><code>object.blp</code></td><td><code>CHOBJECT</code></td><td>Foreground objects — pickups, items, enemies</td></tr>
+              <tr><td><code>jauge.blp</code></td><td><code>CHJAUGE</code></td><td>Health/gauge bar sprites</td></tr>
+              <tr><td><code>map.blp</code></td><td><code>CHMAP</code></td><td>Minimap sprites</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="image08-ui">UI and Screen Images</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>button.blp</code></td><td>UI buttons (<code>CHBUTTON</code>)</td></tr>
+              <tr><td><code>mouse.blp</code></td><td>Mouse cursor sprites</td></tr>
+              <tr><td><code>text.blp</code></td><td>Normal text characters (<code>CHTEXT</code>)</td></tr>
+              <tr><td><code>littletxt.blp</code></td><td>Small text characters (<code>CHLITTLE</code>)</td></tr>
+              <tr><td>Various <code>screen*.blp</code></td><td>Menu and intro background screens</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="image16">IMAGE16/ Directory — 16-bit Images</h2>
+        <p>
+          Contains ~55 <code>.blp</code> files. Used when <code>TrueColorBack=16</code>
+          or <code>TrueColorDecor=16</code> (the default). This set mirrors IMAGE08 but:
+        </p>
+        <ul>
+          <li>Provides higher visual quality (16-bit true-color vs. 8-bit palette)</li>
+          <li>Omits <code>jauge.blp</code> and <code>map.blp</code> — these remain 8-bit only</li>
+          <li>Contains the same character and decor sheets in 16-bit format</li>
+        </ul>
+
+        <h2 id="sound">SOUND/ Directory</h2>
+        <p>Contains ~103 files: 10 music tracks and 93 sound effects.</p>
+
+        <h3 id="sound-music">Music Tracks</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>MUSIC000.BLP</code></td><td>Background music track 0</td></tr>
+              <tr><td><code>MUSIC001.BLP</code></td><td>Background music track 1</td></tr>
+              <tr><td>…</td><td>…</td></tr>
+              <tr><td><code>MUSIC009.BLP</code></td><td>Background music track 9</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Music track selection is stored per-level in the <code>DescFile::music</code> field.</p>
+
+        <h3 id="sound-effects">Sound Effects</h3>
+        <p>
+          93 sound effects in <code>gamefiles/SOUND/</code>. The numeric index maps directly
+          to the <code>SOUND_*</code> constant value. File name case differs by index:
+          indices 0–65 use uppercase (<code>SOUND000.BLP</code>–<code>SOUND065.BLP</code>);
+          indices 66–92 use lowercase (<code>sound066.blp</code>–<code>sound092.blp</code>).
+        </p>
+        <p>See <a href="reference/sound-effects.html">Sound Effects Reference</a> for the complete list of all 93 constants.</p>
+
+        <h2 id="loading-pipeline">Asset Loading Pipeline</h2>
+        <ol>
+          <li>On startup, <code>CPixmap::CacheAll(TRUE, …)</code> loads all image assets into DirectDraw surfaces</li>
+          <li>Images are loaded into specific <a href="reference/image-channels.html">image channels</a></li>
+          <li>The appropriate 8-bit or 16-bit set is chosen based on <code>TrueColorBack</code> / <code>TrueColorDecor</code> config</li>
+          <li><code>CSound</code> loads sound files from <code>gamefiles/SOUND/</code> on demand or preloaded</li>
+          <li>Level files are loaded from <code>gamefiles/DATA/</code> via <code>CDecor</code> (decio.cpp)</li>
+        </ol>
+
+        <h2 id="file-naming">Naming Conventions</h2>
+        <ul>
+          <li>Image files: lowercase (<code>decor000.blp</code>, <code>object.blp</code>)</li>
+          <li>Sound files: uppercase extension for MUSIC000–009 and SOUND000–065; lowercase for sound066–092</li>
+          <li>Level files: lowercase (<code>world010.blp</code>)</li>
+          <li>All assets use <code>.blp</code> extension regardless of actual content type</li>
+        </ul>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="controls.html">← <span class="pnl-label">Controls</span></a>
+          <a class="page-nav-link next" href="levels.html"><span class="pnl-label">Levels &amp; Worlds</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/script.js"></script>
+<script>initPage('assets');</script>
+</body>
+</html>

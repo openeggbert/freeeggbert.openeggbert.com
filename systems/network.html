@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network System — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Systems</a>
+          <span class="sep">/</span>
+          <span class="current">Network System</span>
+        </nav>
+
+        <h1>Network System</h1>
+
+        <div class="callout danger">
+          <span class="callout-icon">🚨</span>
+          <div class="callout-body">
+            <div class="callout-title">Multiplayer is currently broken</div>
+            Network synchronization (<code>src/decnet.cpp</code>) is incomplete.
+            DirectPlay support through Free Direct / Free API is unverified.
+            This page documents the intended architecture from the source code and README.
+          </div>
+        </div>
+
+        <h2 id="overview">Overview</h2>
+        <p>
+          Free Eggbert supports up to <strong>4 simultaneous network players</strong> via
+          <strong>DirectPlay</strong> (DirectX 3). The implementation spans two files:
+        </p>
+        <ul>
+          <li>
+            <code>src/network.cpp</code> — <code>CNetwork</code> class: DirectPlay session
+            management, lobby browsing, transport selection
+          </li>
+          <li>
+            <code>src/decnet.cpp</code> — <code>CDecor</code> network methods: in-game
+            tick-by-tick synchronization, packet send/receive, event replay
+          </li>
+        </ul>
+
+        <h2 id="session-lifecycle">Session Lifecycle</h2>
+        <p>
+          The multiplayer flow is driven by <code>WM_PHASE_*</code> messages dispatched by
+          <code>CEvent</code>:
+        </p>
+        <ol>
+          <li>
+            <strong><code>WM_PHASE_SERVICE</code></strong> — Player selects the DirectPlay
+            transport (IPX, TCP/IP, modem)
+          </li>
+          <li>
+            <strong><code>WM_PHASE_SESSION</code></strong> — Browse existing sessions
+            (up to <code>MAXSESSION</code>=100 shown) or create a new one
+          </li>
+          <li>
+            <strong><code>WM_PHASE_MULTI</code></strong> — Pre-game lobby; players wait until
+            the host starts the game
+          </li>
+          <li>
+            <strong><code>WM_PHASE_PLAY</code></strong> — Synchronized gameplay; each player
+            sends a <code>NetPacket</code> every game tick
+          </li>
+        </ol>
+
+        <h2 id="packet-flow">Packet Flow (Per Tick)</h2>
+        <p>Every game tick during <code>WM_PHASE_PLAY</code>:</p>
+        <ol>
+          <li>
+            Each player constructs a <code>NetPacket</code> from their current input
+            (<code>KEY_*</code> bitmask), position (<code>blupiPosX/Y</code>),
+            animation state (<code>blupiIcon</code>, <code>blupiChannel</code>),
+            and vehicle (<code>blupiTransport</code>)
+          </li>
+          <li>Up to 5 <code>NetMessage</code> game events are embedded in the packet</li>
+          <li>The packet is broadcast via <code>CNetwork::Send()</code> to all other players</li>
+          <li>Each client receives packets, replays the events in <code>decnet.cpp</code></li>
+        </ol>
+
+        <h2 id="packet-types">Packet Types (PK_*)</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>PK_LEAVE</code></td><td>8</td><td>Player left the session gracefully</td></tr>
+              <tr><td><code>PK_LOST</code></td><td>9</td><td>Player connection lost (dropped)</td></tr>
+              <tr><td><code>PK_DIE</code></td><td>10</td><td>Player character died</td></tr>
+              <tr><td><code>PK_PAUSE</code></td><td>12</td><td>Game pause toggled by a player</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="mess-constants">Game Events (MESS_*)</h2>
+        <p>
+          Up to <code>MAXMESSAGEPERPACKET</code> (5) game events can be piggy-backed in each
+          <code>NetPacket</code>. They use <code>NetMessage</code> structs with a <code>type</code>
+          field set to one of these constants:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>MESS_RESUME</code></td><td>0</td><td>Resume game after pause</td></tr>
+              <tr><td><code>MESS_PAUSE</code></td><td>1</td><td>Pause the game</td></tr>
+              <tr><td><code>MESS_LOBBY</code></td><td>4</td><td>Return to lobby</td></tr>
+              <tr><td><code>MESS_START</code></td><td>10</td><td>Start game from lobby</td></tr>
+              <tr><td><code>MESS_OBJECTSTART</code></td><td>20</td><td>Spawn a new moving object</td></tr>
+              <tr><td><code>MESS_OBJECTDELETE</code></td><td>21</td><td>Remove a moving object</td></tr>
+              <tr><td><code>MESS_MODIFDECOR</code></td><td>30</td><td>Modify a world decor cell</td></tr>
+              <tr><td><code>MESS_PLAYSOUND</code></td><td>40</td><td>Play a sound effect</td></tr>
+              <tr><td><code>MESS_STOPSOUND</code></td><td>41</td><td>Stop a sound effect</td></tr>
+              <tr><td><code>MESS_ASCENSEURSTART</code></td><td>50</td><td>Start an elevator</td></tr>
+              <tr><td><code>MESS_ASCENSEUREND</code></td><td>51</td><td>Stop an elevator</td></tr>
+              <tr><td><code>MESS_STOPCLOUD</code></td><td>60</td><td>Stop cloud invisibility effect</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="personal-bombs">Personal Bombs</h2>
+        <p>
+          In multiplayer mode, each player has their own colored personal bomb type.
+          These are fired and tracked independently per player, allowing bombs to be
+          attributed to their owner:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Player</th><th>Constant</th><th>Color</th></tr></thead>
+            <tbody>
+              <tr><td>Player 1</td><td><code>TYPE_BOMBEPERSO1</code></td><td>Yellow</td></tr>
+              <tr><td>Player 2</td><td><code>TYPE_BOMBEPERSO2</code></td><td>Orange</td></tr>
+              <tr><td>Player 3</td><td><code>TYPE_BOMBEPERSO3</code></td><td>Blue</td></tr>
+              <tr><td>Player 4</td><td><code>TYPE_BOMBEPERSO4</code></td><td>Green</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="data-structures">Data Structures</h2>
+        <p>
+          See <a href="../reference/data-structures.html#netpacket">Data Structures — NetPacket</a>
+          for the full <code>NetPacket</code> and <code>NetMessage</code> struct field tables.
+        </p>
+
+        <h2 id="limits">Network Limits</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>MAXNETPLAYER</code></td><td>4</td><td>Maximum simultaneous players</td></tr>
+              <tr><td><code>MAXTEAM</code></td><td>4</td><td>Maximum teams</td></tr>
+              <tr><td><code>MAXSESSION</code></td><td>100</td><td>Max sessions listed in browser</td></tr>
+              <tr><td><code>MAXNETMESSAGE</code></td><td>20</td><td>Max pending queued messages</td></tr>
+              <tr><td><code>MAXMESSAGEPERPACKET</code></td><td>5</td><td>Max game events per packet</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="related">Related Pages</h2>
+        <ul>
+          <li><a href="../modules/cnetwork.html">CNetwork module</a> — session management class</li>
+          <li><a href="../reference/data-structures.html#netpacket">NetPacket / NetMessage structs</a></li>
+          <li><a href="../reference/game-phases.html">Game Phases Reference</a> — WM_PHASE_SERVICE, WM_PHASE_SESSION, WM_PHASE_MULTI</li>
+          <li><a href="../reference/object-types.html">Object Types</a> — TYPE_BOMBEPERSO1–4</li>
+        </ul>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="../modules/ui.html">← <span class="pnl-label">UI Components</span></a>
+          <a class="page-nav-link next" href="../development/index.html"><span class="pnl-label">Dev Guide Index</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('network-system');</script>
+</body>
+</html>

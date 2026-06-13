@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer Guide — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <span class="current">Developer Guide</span>
+        </nav>
+
+        <h1>Developer Guide</h1>
+        <p>
+          Resources for contributors working on the Free Eggbert reconstruction.
+          This section covers known technical issues, decompilation methodology, and development priorities.
+        </p>
+
+        <div class="card-grid">
+          <a class="card" href="known-issues.html">
+            <div class="card-icon">🐛</div>
+            <h3>Known Issues</h3>
+            <p>Detailed technical issue list from TODO.md — build, DirectDraw, decompilation artifacts, audio, networking.</p>
+          </a>
+          <a class="card" href="decompilation-notes.html">
+            <div class="card-icon">🔬</div>
+            <h3>Decompilation Notes</h3>
+            <p>Symbol name sources, confirmed decompilation bugs, _LEGACY flag, comparison with Planet Blupi.</p>
+          </a>
+          <a class="card" href="../reverse-engineering.html">
+            <div class="card-icon">🛠️</div>
+            <h3>Reverse Engineering</h3>
+            <p>Methodology: Ghidra, IDA, ILSpy, decompilation tools, artifact catalog.</p>
+          </a>
+          <a class="card" href="../roadmap.html">
+            <div class="card-icon">🗺️</div>
+            <h3>Roadmap</h3>
+            <p>Immediate goals, core development checklist, debugging priorities.</p>
+          </a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('dev-index');</script>
+</body>
+</html>

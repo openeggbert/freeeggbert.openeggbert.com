@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPixmap — Free Eggbert Documentation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-depth="1">
+<div id="page-wrapper">
+  <header id="site-header"></header>
+  <div id="content-wrapper">
+    <aside id="sidebar"></aside>
+    <main id="main-content">
+      <div class="content-inner">
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span class="sep">/</span>
+          <a href="index.html">Modules</a>
+          <span class="sep">/</span>
+          <span class="current">CPixmap</span>
+        </nav>
+
+        <h1>CPixmap</h1>
+        <p>
+          <strong>Header:</strong> <code>include/pixmap.hpp</code><br>
+          <strong>Implementation:</strong> <code>src/pixmap.cpp</code> (~1,922 lines) +
+          <code>src/pixtables.cpp</code> (static lookup tables)
+        </p>
+        <p>
+          <code>CPixmap</code> is the <strong>DirectDraw surface manager</strong>.
+          It owns all image surfaces, manages the 15 render channels, handles sprite blitting,
+          and drives the final display flip from the back buffer to the screen.
+          All drawing in Free Eggbert goes through <code>CPixmap</code>.
+        </p>
+
+        <h2 id="overview">Overview</h2>
+        <p>
+          <code>CPixmap</code> wraps DirectDraw (DirectX 3) surfaces and exposes a higher-level
+          API for loading sprite sheets, drawing sprites, and compositing the scene.
+          Via Free Direct, these DirectDraw calls are translated to SDL3.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Role</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>src/pixmap.cpp</code></td>
+                <td>DirectDraw surface allocation, blitting, sprite drawing, display flip</td>
+                <td><span class="badge badge-done">Done</span></td>
+              </tr>
+              <tr>
+                <td><code>src/pixtables.cpp</code></td>
+                <td>Static lookup tables for pixmap operations</td>
+                <td><span class="badge badge-done">Done</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="channels">The 15 Image Channels</h2>
+        <p>
+          <code>CPixmap</code> manages up to 15 simultaneous DirectDraw surfaces, each
+          identified by a channel enum defined in <code>include/def.hpp</code>.
+          Each channel holds the sprite sheet for one visual category.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Enum</th><th>Value</th><th>Loaded from (IMAGE08/IMAGE16)</th></tr></thead>
+            <tbody>
+              <tr><td><code>CHBACK</code></td><td>0</td><td><code>decor000–031.blp</code> (selected by region)</td></tr>
+              <tr><td><code>CHOBJECT</code></td><td>1</td><td><code>object.blp</code></td></tr>
+              <tr><td><code>CHBLUPI</code></td><td>2</td><td><code>blupi000.blp</code> (default player)</td></tr>
+              <tr><td><code>CHDECOR</code></td><td>3</td><td>Decorative overlay layer</td></tr>
+              <tr><td><code>CHBUTTON</code></td><td>4</td><td><code>button.blp</code></td></tr>
+              <tr><td><code>CHJAUGE</code></td><td>5</td><td><code>jauge.blp</code> (always 8-bit)</td></tr>
+              <tr><td><code>CHTEXT</code></td><td>6</td><td><code>text.blp</code></td></tr>
+              <tr><td><code>CHLITTLE</code></td><td>7</td><td><code>littletxt.blp</code></td></tr>
+              <tr><td><code>CHMAP</code></td><td>8</td><td><code>map.blp</code> (always 8-bit)</td></tr>
+              <tr><td><code>CHEXPLO</code></td><td>9</td><td><code>explo.blp</code></td></tr>
+              <tr><td><code>CHELEMENT</code></td><td>10</td><td><code>element.blp</code></td></tr>
+              <tr><td><code>CHBLUPI1</code></td><td>11</td><td><code>blupi001.blp</code></td></tr>
+              <tr><td><code>CHBLUPI2</code></td><td>12</td><td><code>blupi002.blp</code></td></tr>
+              <tr><td><code>CHBLUPI3</code></td><td>13</td><td><code>blupi003.blp</code></td></tr>
+              <tr><td><code>CHTEMP</code> / <code>CHMAX</code></td><td>14</td><td>Temporary scratch surface</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          See <a href="../reference/image-channels.html">Image Channels Reference</a> for full details
+          and the note on <code>CHJAUGE</code> and <code>CHMAP</code> always being 8-bit.
+        </p>
+
+        <h2 id="key-methods">Key Methods</h2>
+        <p>Full signatures from <code>include/pixmap.hpp</code>:</p>
+        <pre><code><span class="cmt">// Initialization</span>
+BOOL Create(HWND hwnd, POINT dim, BOOL bFullScreen,
+            <span class="kw2">int</span> mouseType, BOOL bTrueColor, BOOL bTrueColorDecor);
+BOOL CacheAll(BOOL cache, HWND hWnd, BOOL bFullScreen,
+              BOOL bTrueColor, BOOL bTrueColorDecor,
+              <span class="kw2">int</span> mouseType, <span class="kw">const</span> <span class="kw2">char</span>* pFilename, <span class="kw2">int</span> region);
+BOOL Restore();
+BOOL Flush();
+
+<span class="cmt">// Loading channels</span>
+BOOL Cache(<span class="kw2">int</span> channel, <span class="kw2">char</span>* pFilename,
+           POINT totalDim, POINT iconDim, BOOL bUsePalette);
+BOOL BackgroundCache(<span class="kw2">int</span> channel, <span class="kw">const</span> <span class="kw2">char</span>* pFilename,
+                     POINT totalDim, POINT iconDim, BOOL bUsePalette);
+<span class="kw">void</span> Flush(<span class="kw2">int</span> channel);
+
+<span class="cmt">// Drawing (chDst = destination channel/surface)</span>
+BOOL DrawIcon(<span class="kw2">int</span> chDst, <span class="kw2">int</span> channel, <span class="kw2">int</span> rank,
+              POINT pos, <span class="kw2">int</span> mode=0, BOOL bMask=FALSE);
+BOOL DrawIconDemi(<span class="kw2">int</span> chDst, <span class="kw2">int</span> channel, <span class="kw2">int</span> rank,
+                  POINT pos, <span class="kw2">int</span> mode=0, BOOL bMask=FALSE);
+BOOL DrawIconPart(<span class="kw2">int</span> chDst, <span class="kw2">int</span> channel, <span class="kw2">int</span> rank,
+                  POINT pos, <span class="kw2">int</span> startY, <span class="kw2">int</span> endY,
+                  <span class="kw2">int</span> mode=0, BOOL bMask=FALSE);
+BOOL DrawPart(<span class="kw2">int</span> chDst, <span class="kw2">int</span> channel,
+              POINT dest, RECT rect, <span class="kw2">int</span> mode=0, BOOL bMask=FALSE);
+BOOL DrawImage(<span class="kw2">int</span> chDst, <span class="kw2">int</span> channel, RECT rect, <span class="kw2">int</span> mode=0);
+BOOL DrawMap(<span class="kw2">int</span> channel, RECT src, RECT dest);
+<span class="kw">void</span> HudIcon(<span class="kw2">int</span> channel, <span class="kw2">int</span> rank, POINT pos);
+<span class="kw">void</span> QuickIcon(<span class="kw2">int</span> channel, <span class="kw2">int</span> rank, POINT pos);
+
+<span class="cmt">// Display</span>
+BOOL Display();               <span class="cmt">// flip back buffer to screen</span>
+<span class="kw">void</span> Fill(RECT rect, COLORREF color);
+
+<span class="cmt">// Mouse cursor</span>
+<span class="kw">void</span> SetMousePosSprite(POINT pos, <span class="kw2">int</span> sprite, BOOL bDemoPlay);
+<span class="kw">void</span> MouseShow(BOOL bShow);
+
+<span class="cmt">// Color depth</span>
+<span class="kw">void</span> SetTrueColorBack(BOOL bTrueColor);
+<span class="kw">void</span> SetTrueColorDecor(BOOL bTrueColorDecor);
+BOOL GetTrueColorBack();
+BOOL GetTrueColorDecor();</code></pre>
+
+        <h2 id="render-pipeline">Render Pipeline</h2>
+        <p>Each frame, <code>CDecor::Build()</code> orchestrates rendering through <code>CPixmap</code>:</p>
+        <ol>
+          <li>Clear the back buffer (channel <code>CHBACK</code> terrain drawn first)</li>
+          <li>Draw background decor tiles from the current region sheet</li>
+          <li>Draw foreground objects from <code>CHOBJECT</code></li>
+          <li>Draw player character from <code>CHBLUPI</code> (or <code>CHBLUPI1–3</code> in multiplayer)</li>
+          <li>Draw explosions from <code>CHEXPLO</code></li>
+          <li>Draw UI elements (buttons, gauges) from <code>CHBUTTON</code> / <code>CHJAUGE</code></li>
+          <li>Draw text overlays from <code>CHTEXT</code> / <code>CHLITTLE</code></li>
+          <li>Call <code>Display()</code> to present the final frame</li>
+        </ol>
+
+        <h2 id="color-depth">Color Depth Modes</h2>
+        <p>
+          <code>CPixmap</code> supports 8-bit (palette) and 16-bit (true color) surfaces.
+          The mode is set via <code>config.def</code> keys <code>TrueColorBack</code> and
+          <code>TrueColorDecor</code>. IMAGE16 is the default for character/decor sprites;
+          IMAGE08 is used when configured to 8-bit mode.
+        </p>
+        <div class="callout note">
+          <span class="callout-icon">ℹ️</span>
+          <div class="callout-body">
+            <code>jauge.blp</code> and <code>map.blp</code> do not have IMAGE16 counterparts —
+            they are always loaded from IMAGE08 regardless of the color depth setting.
+          </div>
+        </div>
+
+        <h2 id="known-issues">Known Decompilation Issues</h2>
+
+        <div class="callout danger">
+          <span class="callout-icon">🚨</span>
+          <div class="callout-body">
+            <div class="callout-title">Double Create() call</div>
+            The decompiled startup code calls <code>CPixmap::Create()</code> twice: once
+            directly in <code>DoInit()</code> and again inside <code>CacheAll()</code>.
+            Under real DirectDraw 3 this could produce
+            <code>DDERR_PRIMARYSURFACEALREADYEXISTS</code> or <code>DDERR_EXCLUSIVEMODEALREADYSET</code>.
+            Free Direct currently tolerates this; the root cause is under investigation.
+          </div>
+        </div>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Parameter swap: bTrueColorBack / bTrueColorDecor</div>
+            The declaration in <code>pixmap.hpp</code> and the definition in
+            <code>pixmap.cpp</code> have the <code>bTrueColor</code> and
+            <code>bTrueColorDecor</code> parameters in the opposite order, causing
+            the wrong value to be used for each setting.
+            See <a href="../development/decompilation-notes.html">Decompilation Notes</a>.
+          </div>
+        </div>
+
+        <div class="callout warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">delete this in CacheAll(FALSE)</div>
+            <code>CacheAll(FALSE, ...)</code> contains a <code>delete this</code> pattern
+            copied directly from the decompiled binary. This is inherently unsafe in C++
+            and is guarded by the <code>_LEGACY</code> compile flag.
+          </div>
+        </div>
+
+        <div class="page-nav">
+          <a class="page-nav-link" href="cdecor.html">← <span class="pnl-label">CDecor</span></a>
+          <a class="page-nav-link next" href="csound.html"><span class="pnl-label">CSound</span> →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+<script>initPage('cpixmap');</script>
+</body>
+</html>
